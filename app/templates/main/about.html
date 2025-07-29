@@ -1,0 +1,673 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="hero-section text-center text-white py-5 mb-0">
+    <div class="container">
+        <h1 class="display-4 fw-bold mb-4">
+            <i class="bi bi-info-circle"></i>
+            حول خدمتنا
+        </h1>
+        <p class="lead">
+            منصة متكاملة لإدارة وإرسال البريد الإلكتروني للشركات
+        </p>
+    </div>
+</div>
+
+<div class="container my-5">
+    <!-- قصة الشركة -->
+    <div class="row mb-5">
+        <div class="col-lg-6">
+            <div class="card h-100">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">
+                        <i class="bi bi-building"></i>
+                        من نحن؟
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <p class="lead">
+                        نحن فريق متخصص في تطوير حلول البريد الإلكتروني للشركات، 
+                        نسعى لتوفير أفضل الخدمات التقنية بأسعار مناسبة.
+                    </p>
+                    <p>
+                        تأسست شركتنا عام 2023 بهدف حل مشاكل إرسال البريد الإلكتروني 
+                        التي تواجه الشركات والمطورين. نقدم حلول مبتكرة وسهلة الاستخدام 
+                        مع ضمان الأمان والموثوقية.
+                    </p>
+                    
+                    <div class="row text-center mt-4">
+                        <div class="col-4">
+                            <div class="bg-light rounded p-3">
+                                <h4 class="text-primary mb-0">500+</h4>
+                                <small class="text-muted">عميل راضي</small>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="bg-light rounded p-3">
+                                <h4 class="text-success mb-0">1M+</h4>
+                                <small class="text-muted">رسالة مُرسلة</small>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="bg-light rounded p-3">
+                                <h4 class="text-info mb-0">99.9%</h4>
+                                <small class="text-muted">وقت التشغيل</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-6">
+            <div class="card h-100">
+                <div class="card-header bg-success text-white">
+                    <h3 class="mb-0">
+                        <i class="bi bi-bullseye"></i>
+                        رؤيتنا ورسالتنا
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <div class="mb-4">
+                        <h5 class="text-success">
+                            <i class="bi bi-eye"></i> رؤيتنا
+                        </h5>
+                        <p>
+                            أن نكون الخيار الأول للشركات في المنطقة العربية لحلول 
+                            البريد الإلكتروني، ونساهم في تطوير التجارة الإلكترونية 
+                            من خلال خدمات موثوقة ومبتكرة.
+                        </p>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <h5 class="text-primary">
+                            <i class="bi bi-flag"></i> رسالتنا
+                        </h5>
+                        <p>
+                            توفير حلول بريد إلكتروني متطورة وسهلة الاستخدام تساعد 
+                            الشركات على التواصل الفعال مع عملائها، مع ضمان الأمان 
+                            والموثوقية والدعم المتميز.
+                        </p>
+                    </div>
+                    
+                    <div>
+                        <h5 class="text-warning">
+                            <i class="bi bi-gem"></i> قيمنا
+                        </h5>
+                        <ul class="list-unstyled">
+                            <li><i class="bi bi-check-circle text-success"></i> الموثوقية والأمان</li>
+                            <li><i class="bi bi-check-circle text-success"></i> سهولة الاستخدام</li>
+                            <li><i class="bi bi-check-circle text-success"></i> الدعم المتميز</li>
+                            <li><i class="bi bi-check-circle text-success"></i> التطوير المستمر</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- الخدمات الرئيسية -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header text-center bg-info text-white">
+                    <h3 class="mb-0">
+                        <i class="bi bi-gear"></i>
+                        خدماتنا الرئيسية
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 col-lg-3 mb-4">
+                            <div class="text-center p-4 border rounded service-item">
+                                <div class="bg-primary text-white rounded-circle mx-auto mb-3" 
+                                     style="width: 80px; height: 80px; display: flex; align-items: center; justify-content: center;">
+                                    <i class="bi bi-shield-check" style="font-size: 2rem;"></i>
+                                </div>
+                                <h5>رموز التحقق</h5>
+                                <p class="text-muted">
+                                    إرسال رموز التحقق الآمنة للتسجيل 
+                                    وتأكيد الهوية
+                                </p>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6 col-lg-3 mb-4">
+                            <div class="text-center p-4 border rounded service-item">
+                                <div class="bg-success text-white rounded-circle mx-auto mb-3" 
+                                     style="width: 80px; height: 80px; display: flex; align-items: center; justify-content: center;">
+                                    <i class="bi bi-cart-check" style="font-size: 2rem;"></i>
+                                </div>
+                                <h5>تفاصيل الطلبات</h5>
+                                <p class="text-muted">
+                                    إرسال تفاصيل الطلبات والفواتير 
+                                    للعملاء تلقائياً
+                                </p>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6 col-lg-3 mb-4">
+                            <div class="text-center p-4 border rounded service-item">
+                                <div class="bg-warning text-white rounded-circle mx-auto mb-3" 
+                                     style="width: 80px; height: 80px; display: flex; align-items: center; justify-content: center;">
+                                    <i class="bi bi-heart" style="font-size: 2rem;"></i>
+                                </div>
+                                <h5>رسائل الترحيب</h5>
+                                <p class="text-muted">
+                                    ترحيب احترافي بالعملاء الجدد 
+                                    مع شرح الخدمات
+                                </p>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6 col-lg-3 mb-4">
+                            <div class="text-center p-4 border rounded service-item">
+                                <div class="bg-info text-white rounded-circle mx-auto mb-3" 
+                                     style="width: 80px; height: 80px; display: flex; align-items: center; justify-content: center;">
+                                    <i class="bi bi-palette" style="font-size: 2rem;"></i>
+                                </div>
+                                <h5>قوالب مخصصة</h5>
+                                <p class="text-muted">
+                                    تصميم قوالب مخصصة بهوية 
+                                    شركتك وألوانك
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- المميزات التقنية -->
+    <div class="row mb-5">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="mb-0">
+                        <i class="bi bi-cpu"></i>
+                        المميزات التقنية
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-start mb-3">
+                                <div class="bg-primary text-white rounded-circle p-2 me-3">
+                                    <i class="bi bi-lightning"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-1">سرعة عالية</h6>
+                                    <p class="text-muted small mb-0">
+                                        إرسال الرسائل في ثوانٍ معدودة مع ضمان الوصول
+                                    </p>
+                                </div>
+                            </div>
+                            
+                            <div class="d-flex align-items-start mb-3">
+                                <div class="bg-success text-white rounded-circle p-2 me-3">
+                                    <i class="bi bi-shield-lock"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-1">أمان متقدم</h6>
+                                    <p class="text-muted small mb-0">
+                                        تشفير SSL وحماية ضد البريد المزعج
+                                    </p>
+                                </div>
+                            </div>
+                            
+                            <div class="d-flex align-items-start mb-3">
+                                <div class="bg-info text-white rounded-circle p-2 me-3">
+                                    <i class="bi bi-graph-up"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-1">تحليلات شاملة</h6>
+                                    <p class="text-muted small mb-0">
+                                        إحصائيات مفصلة عن معدلات الفتح والنقر
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-start mb-3">
+                                <div class="bg-warning text-white rounded-circle p-2 me-3">
+                                    <i class="bi bi-code-slash"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-1">API سهل</h6>
+                                    <p class="text-muted small mb-0">
+                                        تكامل بسيط مع أي موقع أو تطبيق
+                                    </p>
+                                </div>
+                            </div>
+                            
+                            <div class="d-flex align-items-start mb-3">
+                                <div class="bg-danger text-white rounded-circle p-2 me-3">
+                                    <i class="bi bi-headset"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-1">دعم 24/7</h6>
+                                    <p class="text-muted small mb-0">
+                                        فريق دعم متخصص متاح في أي وقت
+                                    </p>
+                                </div>
+                            </div>
+                            
+                            <div class="d-flex align-items-start mb-3">
+                                <div class="bg-secondary text-white rounded-circle p-2 me-3">
+                                    <i class="bi bi-arrow-up-circle"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-1">قابلية التوسع</h6>
+                                    <p class="text-muted small mb-0">
+                                        من الشركات الناشئة إلى المؤسسات الكبيرة
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-award"></i>
+                        شهادات وجوائز
+                    </h5>
+                </div>
+                <div class="card-body text-center">
+                    <div class="mb-3">
+                        <div class="bg-warning text-white rounded-circle mx-auto mb-2" 
+                             style="width: 60px; height: 60px; display: flex; align-items: center; justify-content: center;">
+                            <i class="bi bi-trophy" style="font-size: 1.5rem;"></i>
+                        </div>
+                        <h6>أفضل خدمة بريد إلكتروني</h6>
+                        <small class="text-muted">جائزة التقنية 2023</small>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <div class="bg-primary text-white rounded-circle mx-auto mb-2" 
+                             style="width: 60px; height: 60px; display: flex; align-items: center; justify-content: center;">
+                            <i class="bi bi-patch-check" style="font-size: 1.5rem;"></i>
+                        </div>
+                        <h6>شهادة ISO 27001</h6>
+                        <small class="text-muted">أمان المعلومات</small>
+                    </div>
+                    
+                    <div>
+                        <div class="bg-success text-white rounded-circle mx-auto mb-2" 
+                             style="width: 60px; height: 60px; display: flex; align-items: center; justify-content: center;">
+                            <i class="bi bi-star-fill" style="font-size: 1.5rem;"></i>
+                        </div>
+                        <h6>تقييم 5 نجوم</h6>
+                        <small class="text-muted">رضا العملاء</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- فريق العمل -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header text-center">
+                    <h3 class="mb-0">
+                        <i class="bi bi-people"></i>
+                        فريق العمل
+                    </h3>
+                    <p class="mb-0 text-muted">تعرف على الفريق المتميز وراء نجاح خدمتنا</p>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-lg-3 col-md-6 mb-4">
+                            <div class="card border-0 text-center team-member">
+                                <div class="position-relative">
+                                    <div class="bg-primary text-white rounded-circle mx-auto mb-3" 
+                                         style="width: 100px; height: 100px; display: flex; align-items: center; justify-content: center;">
+                                        <i class="bi bi-person" style="font-size: 3rem;"></i>
+                                    </div>
+                                    <div class="position-absolute top-0 end-0 bg-success text-white rounded-circle p-1">
+                                        <i class="bi bi-check" style="font-size: 0.8rem;"></i>
+                                    </div>
+                                </div>
+                                <h5>أحمد محمد</h5>
+                                <p class="text-muted">المدير التقني</p>
+                                <p class="small">
+                                    خبرة 10 سنوات في تطوير الأنظمة 
+                                    وحلول البريد الإلكتروني
+                                </p>
+                            </div>
+                        </div>
+                        
+                        <div class="col-lg-3 col-md-6 mb-4">
+                            <div class="card border-0 text-center team-member">
+                                <div class="position-relative">
+                                    <div class="bg-success text-white rounded-circle mx-auto mb-3" 
+                                         style="width: 100px; height: 100px; display: flex; align-items: center; justify-content: center;">
+                                        <i class="bi bi-person" style="font-size: 3rem;"></i>
+                                    </div>
+                                    <div class="position-absolute top-0 end-0 bg-success text-white rounded-circle p-1">
+                                        <i class="bi bi-check" style="font-size: 0.8rem;"></i>
+                                    </div>
+                                </div>
+                                <h5>فاطمة علي</h5>
+                                <p class="text-muted">مديرة المبيعات</p>
+                                <p class="small">
+                                    متخصصة في تطوير الأعمال 
+                                    وعلاقات العملاء
+                                </p>
+                            </div>
+                        </div>
+                        
+                        <div class="col-lg-3 col-md-6 mb-4">
+                            <div class="card border-0 text-center team-member">
+                                <div class="position-relative">
+                                    <div class="bg-info text-white rounded-circle mx-auto mb-3" 
+                                         style="width: 100px; height: 100px; display: flex; align-items: center; justify-content: center;">
+                                        <i class="bi bi-person" style="font-size: 3rem;"></i>
+                                    </div>
+                                    <div class="position-absolute top-0 end-0 bg-success text-white rounded-circle p-1">
+                                        <i class="bi bi-check" style="font-size: 0.8rem;"></i>
+                                    </div>
+                                </div>
+                                <h5>محمد حسن</h5>
+                                <p class="text-muted">مطور البرمجيات</p>
+                                <p class="small">
+                                    خبير في Python وتطوير 
+                                    واجهات برمجة التطبيقات
+                                </p>
+                            </div>
+                        </div>
+                        
+                        <div class="col-lg-3 col-md-6 mb-4">
+                            <div class="card border-0 text-center team-member">
+                                <div class="position-relative">
+                                    <div class="bg-warning text-white rounded-circle mx-auto mb-3" 
+                                         style="width: 100px; height: 100px; display: flex; align-items: center; justify-content: center;">
+                                        <i class="bi bi-person" style="font-size: 3rem;"></i>
+                                    </div>
+                                    <div class="position-absolute top-0 end-0 bg-success text-white rounded-circle p-1">
+                                        <i class="bi bi-check" style="font-size: 0.8rem;"></i>
+                                    </div>
+                                </div>
+                                <h5>سارة أحمد</h5>
+                                <p class="text-muted">دعم العملاء</p>
+                                <p class="small">
+                                    متخصصة في حل المشاكل التقنية 
+                                    ودعم العملاء
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- آراء العملاء -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header text-center">
+                    <h3 class="mb-0">
+                        <i class="bi bi-chat-quote"></i>
+                        ماذا يقول عملاؤنا؟
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4 mb-4">
+                            <div class="bg-light p-4 rounded h-100">
+                                <div class="text-warning mb-2">
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                </div>
+                                <p class="mb-3">
+                                    "خدمة ممتازة وسريعة! تمكنا من تحسين تواصلنا مع العملاء 
+                                    بشكل كبير. الدعم الفني متميز جداً."
+                                </p>
+                                <div class="d-flex align-items-center">
+                                    <div class="bg-primary text-white rounded-circle me-3 p-2">
+                                        <i class="bi bi-person"></i>
+                                    </div>
+                                    <div>
+                                        <h6 class="mb-0">خالد السيد</h6>
+                                        <small class="text-muted">مدير تقني - شركة التجارة الذكية</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-4 mb-4">
+                            <div class="bg-light p-4 rounded h-100">
+                                <div class="text-warning mb-2">
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                </div>
+                                <p class="mb-3">
+                                    "الأسعار مناسبة جداً مقارنة بالخدمات الأخرى، والجودة عالية. 
+                                    أنصح بها جميع أصحاب المتاجر الإلكترونية."
+                                </p>
+                                <div class="d-flex align-items-center">
+                                    <div class="bg-success text-white rounded-circle me-3 p-2">
+                                        <i class="bi bi-person"></i>
+                                    </div>
+                                    <div>
+                                        <h6 class="mb-0">نورا حسام</h6>
+                                        <small class="text-muted">مؤسسة - متجر الأزياء العصرية</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-4 mb-4">
+                            <div class="bg-light p-4 rounded h-100">
+                                <div class="text-warning mb-2">
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                </div>
+                                <p class="mb-3">
+                                    "سهولة في الاستخدام والتكامل مع موقعنا. القوالب المخصصة 
+                                    ساعدتنا في تعزيز هويتنا التجارية."
+                                </p>
+                                <div class="d-flex align-items-center">
+                                    <div class="bg-info text-white rounded-circle me-3 p-2">
+                                        <i class="bi bi-person"></i>
+                                    </div>
+                                    <div>
+                                        <h6 class="mb-0">عمر الشامي</h6>
+                                        <small class="text-muted">مطور - شركة الحلول التقنية</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- دعوة للعمل -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card bg-primary text-white text-center">
+                <div class="card-body py-5">
+                    <h2 class="mb-4">جاهز للبدء؟</h2>
+                    <p class="lead mb-4">
+                        انضم إلى مئات الشركات التي تثق في خدماتنا
+                    </p>
+                    <div class="d-flex flex-wrap justify-content-center gap-3">
+                        <a href="{{ url_for('auth.register') }}" 
+                           class="btn btn-light btn-lg px-4">
+                            <i class="bi bi-person-plus"></i>
+                            ابدأ مجاناً الآن
+                        </a>
+                        <a href="{{ url_for('main.contact') }}" 
+                           class="btn btn-outline-light btn-lg px-4">
+                            <i class="bi bi-telephone"></i>
+                            تواصل معنا
+                        </a>
+                        <a href="{{ url_for('main.documentation') }}" 
+                           class="btn btn-outline-light btn-lg px-4">
+                            <i class="bi bi-book"></i>
+                            اقرأ التوثيق
+                        </a>
+                    </div>
+                    
+                    <div class="row mt-5 text-center">
+                        <div class="col-md-3 mb-3">
+                            <h4>1000</h4>
+                            <small>رسالة مجانية</small>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <h4>0 EGP</h4>
+                            <small>بدون رسوم تسجيل</small>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <h4>5 دقائق</h4>
+                            <small>للبدء</small>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <h4>24/7</h4>
+                            <small>دعم فني</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // تحريك الإحصائيات
+    const stats = document.querySelectorAll('.card-body h4');
+    const observerOptions = {
+        threshold: 0.5
+    };
+    
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                animateNumber(entry.target);
+            }
+        });
+    }, observerOptions);
+    
+    stats.forEach(stat => observer.observe(stat));
+    
+    // تحريك الأرقام
+    function animateNumber(element) {
+        const text = element.textContent;
+        const number = parseInt(text.replace(/[^\d]/g, ''));
+        
+        if (number > 0) {
+            let current = 0;
+            const increment = number / 50;
+            const timer = setInterval(() => {
+                current += increment;
+                if (current >= number) {
+                    current = number;
+                    clearInterval(timer);
+                }
+                element.textContent = text.replace(number, Math.floor(current));
+            }, 30);
+        }
+    }
+    
+    // تأثيرات hover للخدمات
+    const serviceItems = document.querySelectorAll('.service-item');
+    serviceItems.forEach(item => {
+        item.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-5px)';
+            this.style.boxShadow = '0 10px 25px rgba(0,0,0,0.1)';
+            this.style.transition = 'all 0.3s ease';
+        });
+        
+        item.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+            this.style.boxShadow = 'none';
+        });
+    });
+    
+    // تأثيرات فريق العمل
+    const teamMembers = document.querySelectorAll('.team-member');
+    teamMembers.forEach(member => {
+        member.addEventListener('mouseenter', function() {
+            this.style.transform = 'scale(1.05)';
+            this.style.transition = 'transform 0.3s ease';
+        });
+        
+        member.addEventListener('mouseleave', function() {
+            this.style.transform = 'scale(1)';
+        });
+    });
+    
+    // تحريك العناصر عند الدخول للصفحة
+    const cards = document.querySelectorAll('.card');
+    cards.forEach((card, index) => {
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(30px)';
+        
+        setTimeout(() => {
+            card.style.transition = 'all 0.6s ease';
+            card.style.opacity = '1';
+            card.style.transform = 'translateY(0)';
+        }, index * 100);
+    });
+    
+    // إضافة تأثير للشهادات
+    const awards = document.querySelectorAll('[style*="60px"]');
+    setInterval(() => {
+        awards.forEach((award, index) => {
+            setTimeout(() => {
+                award.style.transform = 'scale(1.1)';
+                setTimeout(() => {
+                    award.style.transform = 'scale(1)';
+                }, 200);
+            }, index * 300);
+        });
+    }, 3000);
+});
+
+// محاكاة إحصائيات حية
+function updateLiveStats() {
+    const currentClients = document.querySelector('.text-primary');
+    const messagesSent = document.querySelector('.text-success');
+    const uptime = document.querySelector('.text-info');
+    
+    if (currentClients && messagesSent && uptime) {
+        // زيادة تدريجية في الأرقام
+        const clientCount = parseInt(currentClients.textContent.replace('+', ''));
+        const messageCount = parseFloat(messagesSent.textContent.replace('M+', ''));
+        
+        if (Math.random() > 0.7) { // 30% احتمال للتحديث
+            currentClients.textContent = (clientCount + 1) + '+';
+        }
+        
+        if (Math.random() > 0.9) { // 10% احتمال للتحديث
+            messagesSent.textContent = (messageCount + 0.1).toFixed(1) + 'M+';
+        }
+    }
+}
+
+// تحديث الإحصائيات كل 5 ثوانٍ
+setInterval(updateLiveStats, 5000);
+</script>
+{% endblock %}

@@ -1,0 +1,17 @@
+Flask==2.3.3
+Flask-SQLAlchemy==3.0.5
+Flask-Login==0.6.3
+Flask-WTF==1.1.1
+WTForms==3.0.1
+Flask-Mail==0.9.1
+bcrypt==4.0.1
+python-dotenv==1.0.0
+uuid==1.30
+Pillow==10.0.0
+requests==2.31.0
+python-dateutil==2.8.2
+email-validator==2.0.0
+cryptography==41.0.4
+gunicorn==21.2.0
+psycopg2-binary==2.9.7
+flask-cors==4.0.0

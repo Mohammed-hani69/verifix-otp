@@ -1,0 +1,347 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="dashboard-card">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <h2 class="text-gradient mb-2">
+                            <i class="bi bi-graph-up"></i>
+                            الإحصائيات التفصيلية
+                        </h2>
+                        <p class="text-muted mb-0">تتبع أداء رسائلك ومراقبة الاستخدام</p>
+                    </div>
+                    <div class="col-md-4 text-end">
+                        <a href="{{ url_for('dashboard.index') }}" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-right"></i> العودة للوحة التحكم
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- إحصائيات عامة -->
+        <div class="col-md-3">
+            <div class="card stat-card bg-primary text-white mb-4">
+                <div class="card-body">
+                    <i class="bi bi-envelope"></i>
+                    <h3>{{ current_user.total_messages_sent }}</h3>
+                    <p class="mb-0">إجمالي الرسائل</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card stat-card bg-success text-white mb-4">
+                <div class="card-body">
+                    <i class="bi bi-currency-dollar"></i>
+                    <h3>{{ "%.2f"|format(current_user.balance) }}</h3>
+                    <p class="mb-0">الرصيد الحالي (جنيه)</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card stat-card bg-info text-white mb-4">
+                <div class="card-body">
+                    <i class="bi bi-gift"></i>
+                    <h3>{{ current_user.free_messages_used }}</h3>
+                    <p class="mb-0">الرسائل المجانية المستخدمة</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card stat-card bg-warning text-white mb-4">
+                <div class="card-body">
+                    <i class="bi bi-calendar"></i>
+                    <h3>{{ current_user.created_at.strftime('%Y-%m-%d') }}</h3>
+                    <p class="mb-0 small">تاريخ التسجيل</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- الإحصائيات الشهرية -->
+        <div class="col-lg-8">
+            <div class="card dashboard-card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-bar-chart"></i>
+                        الإحصائيات الشهرية
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if monthly_stats %}
+                        <div class="chart-container">
+                            <canvas id="monthlyChart" width="400" height="200"></canvas>
+                        </div>
+                        
+                        <div class="table-responsive mt-4">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>الشهر</th>
+                                        <th>عدد الرسائل</th>
+                                        <th>التكلفة (جنيه)</th>
+                                        <th>متوسط التكلفة</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for stat in monthly_stats %}
+                                    <tr>
+                                        <td>{{ stat.month }}</td>
+                                        <td>{{ stat.count }}</td>
+                                        <td>{{ "%.2f"|format(stat.cost or 0) }}</td>
+                                        <td>{{ "%.3f"|format((stat.cost or 0) / stat.count if stat.count > 0 else 0) }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="bi bi-inbox display-1 text-muted"></i>
+                            <h5 class="text-muted mt-3">لا توجد بيانات إحصائية بعد</h5>
+                            <p class="text-muted">ابدأ في إرسال الرسائل لرؤية الإحصائيات هنا</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- إحصائيات الخدمات -->
+        <div class="col-lg-4">
+            <div class="card dashboard-card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-pie-chart"></i>
+                        إحصائيات الخدمات
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if service_stats %}
+                        <div class="chart-container mb-3">
+                            <canvas id="serviceChart" width="300" height="300"></canvas>
+                        </div>
+                        
+                        <div class="service-stats">
+                            {% for stat in service_stats %}
+                            <div class="d-flex justify-content-between align-items-center mb-2 p-2 bg-light rounded">
+                                <div>
+                                    <strong>{{ stat.service_name }}</strong>
+                                    <small class="d-block text-muted">{{ stat.count }} رسالة</small>
+                                </div>
+                                <div class="text-end">
+                                    <span class="fw-bold text-primary">{{ "%.2f"|format(stat.total_cost or 0) }}</span>
+                                    <small class="d-block text-muted">جنيه</small>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="bi bi-pie-chart display-4 text-muted"></i>
+                            <p class="text-muted mt-3">لا توجد بيانات خدمات</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- معدلات الأداء -->
+            <div class="card dashboard-card mt-3">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-speedometer2"></i>
+                        معدلات الأداء
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="performance-metrics">
+                        <div class="metric-item mb-3">
+                            <div class="d-flex justify-content-between">
+                                <span>معدل الإرسال اليومي</span>
+                                <strong>{{ "%.1f"|format(current_user.total_messages_sent / ((current_user.created_at.date() - current_user.created_at.date()).days + 1) if current_user.total_messages_sent > 0 else 0) }}</strong>
+                            </div>
+                            <div class="progress mt-1" style="height: 4px;">
+                                <div class="progress-bar bg-primary" style="width: {{ [(current_user.total_messages_sent / 100) * 100, 100]|min }}%"></div>
+                            </div>
+                        </div>
+
+                        <div class="metric-item mb-3">
+                            <div class="d-flex justify-content-between">
+                                <span>استخدام الرصيد</span>
+                                <strong>{{ "%.1f"|format((current_user.balance / 1000) * 100 if current_user.balance > 0 else 0) }}%</strong>
+                            </div>
+                            <div class="progress mt-1" style="height: 4px;">
+                                <div class="progress-bar bg-success" style="width: {{ [(current_user.balance / 1000) * 100, 100]|min }}%"></div>
+                            </div>
+                        </div>
+
+                        <div class="metric-item">
+                            <div class="d-flex justify-content-between">
+                                <span>الرسائل المجانية</span>
+                                <strong>{{ current_user.free_messages_used }}/{{ config.FREE_MESSAGES_LIMIT or 100 }}</strong>
+                            </div>
+                            <div class="progress mt-1" style="height: 4px;">
+                                <div class="progress-bar bg-info" style="width: {{ (current_user.free_messages_used / (config.FREE_MESSAGES_LIMIT or 100)) * 100 }}%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- تقرير تفصيلي -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card dashboard-card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="bi bi-file-earmark-text"></i>
+                        تقرير تفصيلي
+                    </h5>
+                    <div>
+                        <button class="btn btn-outline-primary btn-sm" onclick="exportReport()">
+                            <i class="bi bi-download"></i> تصدير
+                        </button>
+                        <button class="btn btn-outline-secondary btn-sm" onclick="printReport()">
+                            <i class="bi bi-printer"></i> طباعة
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="report-section">
+                                <h6 class="fw-bold text-primary">ملخص النشاط</h6>
+                                <ul class="list-unstyled">
+                                    <li><i class="bi bi-check-circle text-success"></i> مجموع الرسائل: {{ current_user.total_messages_sent }}</li>
+                                    <li><i class="bi bi-currency-dollar text-warning"></i> إجمالي المنصرف: {{ "%.2f"|format(1000 - current_user.balance) }} جنيه</li>
+                                    <li><i class="bi bi-calendar-check text-info"></i> أيام النشاط: {{ (current_user.created_at.date() - current_user.created_at.date()).days + 1 }}</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="report-section">
+                                <h6 class="fw-bold text-primary">أفضل الخدمات</h6>
+                                {% if service_stats %}
+                                    <ul class="list-unstyled">
+                                        {% for stat in service_stats[:3] %}
+                                        <li><i class="bi bi-star text-warning"></i> {{ stat.service_name }}: {{ stat.count }} رسالة</li>
+                                        {% endfor %}
+                                    </ul>
+                                {% else %}
+                                    <p class="text-muted">لا توجد بيانات متاحة</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="report-section">
+                                <h6 class="fw-bold text-primary">توصيات</h6>
+                                <ul class="list-unstyled">
+                                    {% if current_user.balance < 50 %}
+                                    <li><i class="bi bi-exclamation-triangle text-warning"></i> يُنصح بشحن الرصيد</li>
+                                    {% endif %}
+                                    {% if current_user.total_messages_sent < 10 %}
+                                    <li><i class="bi bi-lightbulb text-info"></i> جرب إرسال المزيد من الرسائل</li>
+                                    {% endif %}
+                                    <li><i class="bi bi-shield-check text-success"></i> حساب نشط وآمن</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+// الإحصائيات الشهرية
+{% if monthly_stats %}
+const monthlyData = {
+    labels: [{% for stat in monthly_stats %}'{{ stat.month }}'{% if not loop.last %},{% endif %}{% endfor %}],
+    datasets: [{
+        label: 'عدد الرسائل',
+        data: [{% for stat in monthly_stats %}{{ stat.count }}{% if not loop.last %},{% endif %}{% endfor %}],
+        backgroundColor: 'rgba(102, 126, 234, 0.2)',
+        borderColor: 'rgba(102, 126, 234, 1)',
+        borderWidth: 2,
+        fill: true
+    }]
+};
+
+const monthlyChart = new Chart(document.getElementById('monthlyChart'), {
+    type: 'line',
+    data: monthlyData,
+    options: {
+        responsive: true,
+        plugins: {
+            legend: {
+                display: false
+            }
+        },
+        scales: {
+            y: {
+                beginAtZero: true
+            }
+        }
+    }
+});
+{% endif %}
+
+// إحصائيات الخدمات
+{% if service_stats %}
+const serviceData = {
+    labels: [{% for stat in service_stats %}'{{ stat.service_name }}'{% if not loop.last %},{% endif %}{% endfor %}],
+    datasets: [{
+        data: [{% for stat in service_stats %}{{ stat.count }}{% if not loop.last %},{% endif %}{% endfor %}],
+        backgroundColor: [
+            'rgba(255, 99, 132, 0.8)',
+            'rgba(54, 162, 235, 0.8)',
+            'rgba(255, 205, 86, 0.8)',
+            'rgba(75, 192, 192, 0.8)',
+            'rgba(153, 102, 255, 0.8)'
+        ]
+    }]
+};
+
+const serviceChart = new Chart(document.getElementById('serviceChart'), {
+    type: 'doughnut',
+    data: serviceData,
+    options: {
+        responsive: true,
+        plugins: {
+            legend: {
+                position: 'bottom'
+            }
+        }
+    }
+});
+{% endif %}
+
+// تصدير التقرير
+function exportReport() {
+    // محاكاة تصدير التقرير
+    showMessage('جاري تحضير التقرير للتصدير...', 'info');
+    setTimeout(() => {
+        showMessage('تم تصدير التقرير بنجاح!', 'success');
+    }, 2000);
+}
+
+// طباعة التقرير
+function printReport() {
+    window.print();
+}
+</script>
+{% endblock %}

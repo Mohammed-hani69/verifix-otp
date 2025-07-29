@@ -1,0 +1,250 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="dashboard-card">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <h2 class="text-gradient mb-2">
+                            <i class="bi bi-envelope-gear"></i>
+                            إعدادات البريد الإلكتروني
+                        </h2>
+                        <p class="text-muted mb-0">إعداد خادم SMTP الخاص بك لإرسال الرسائل</p>
+                    </div>
+                    <div class="col-md-4 text-end">
+                        <a href="{{ url_for('dashboard.index') }}" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-right"></i> العودة للوحة التحكم
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card dashboard-card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-server"></i>
+                        إعدادات خادم SMTP
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle"></i>
+                        <strong>مهم:</strong> يجب إعداد هذه الإعدادات قبل البدء في إرسال الرسائل. تأكد من صحة البيانات المدخلة.
+                    </div>
+
+                    <form method="POST" novalidate>
+                        {{ form.hidden_tag() }}
+                        
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="mb-3">
+                                    {{ form.smtp_server.label(class="form-label fw-bold") }}
+                                    {{ form.smtp_server(class="form-control" + (" is-invalid" if form.smtp_server.errors else ""), placeholder="smtp.gmail.com") }}
+                                    {% for error in form.smtp_server.errors %}
+                                        <div class="invalid-feedback">{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    {{ form.smtp_port.label(class="form-label fw-bold") }}
+                                    {{ form.smtp_port(class="form-control" + (" is-invalid" if form.smtp_port.errors else ""), placeholder="587") }}
+                                    {% for error in form.smtp_port.errors %}
+                                        <div class="invalid-feedback">{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    {{ form.smtp_username.label(class="form-label fw-bold") }}
+                                    {{ form.smtp_username(class="form-control" + (" is-invalid" if form.smtp_username.errors else ""), placeholder="your-email@gmail.com") }}
+                                    {% for error in form.smtp_username.errors %}
+                                        <div class="invalid-feedback">{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    {{ form.smtp_password.label(class="form-label fw-bold") }}
+                                    {{ form.smtp_password(class="form-control" + (" is-invalid" if form.smtp_password.errors else ""), placeholder="كلمة مرور التطبيق") }}
+                                    {% for error in form.smtp_password.errors %}
+                                        <div class="invalid-feedback">{{ error }}</div>
+                                    {% endfor %}
+                                    <div class="form-text">استخدم كلمة مرور التطبيق وليس كلمة مرور حسابك الشخصي</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr>
+
+                        <h6 class="fw-bold mb-3">إعدادات المرسل:</h6>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    {{ form.sender_email.label(class="form-label fw-bold") }}
+                                    {{ form.sender_email(class="form-control" + (" is-invalid" if form.sender_email.errors else ""), placeholder="noreply@yourcompany.com") }}
+                                    {% for error in form.sender_email.errors %}
+                                        <div class="invalid-feedback">{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    {{ form.sender_name.label(class="form-label fw-bold") }}
+                                    {{ form.sender_name(class="form-control" + (" is-invalid" if form.sender_name.errors else ""), placeholder="اسم شركتك") }}
+                                    {% for error in form.sender_name.errors %}
+                                        <div class="invalid-feedback">{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <button type="button" class="btn btn-outline-primary" onclick="testConnection()">
+                                <i class="bi bi-wifi"></i> اختبار الاتصال
+                            </button>
+                            {{ form.submit(class="btn btn-primary") }}
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- معلومات إضافية -->
+            <div class="card dashboard-card mt-4">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-question-circle"></i>
+                        كيفية الحصول على إعدادات SMTP
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="accordion" id="smtpGuide">
+                        <!-- Gmail -->
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#gmail">
+                                    <i class="bi bi-google text-danger me-2"></i>
+                                    Gmail
+                                </button>
+                            </h2>
+                            <div id="gmail" class="accordion-collapse collapse" data-bs-parent="#smtpGuide">
+                                <div class="accordion-body">
+                                    <strong>الإعدادات:</strong>
+                                    <ul class="list-unstyled">
+                                        <li><strong>خادم SMTP:</strong> smtp.gmail.com</li>
+                                        <li><strong>المنفذ:</strong> 587</li>
+                                        <li><strong>الأمان:</strong> TLS</li>
+                                    </ul>
+                                    <div class="alert alert-warning">
+                                        <small>يجب تفعيل المصادقة الثنائية وإنشاء كلمة مرور تطبيق من إعدادات الحساب.</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Outlook -->
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#outlook">
+                                    <i class="bi bi-microsoft text-primary me-2"></i>
+                                    Outlook/Hotmail
+                                </button>
+                            </h2>
+                            <div id="outlook" class="accordion-collapse collapse" data-bs-parent="#smtpGuide">
+                                <div class="accordion-body">
+                                    <strong>الإعدادات:</strong>
+                                    <ul class="list-unstyled">
+                                        <li><strong>خادم SMTP:</strong> smtp-mail.outlook.com</li>
+                                        <li><strong>المنفذ:</strong> 587</li>
+                                        <li><strong>الأمان:</strong> STARTTLS</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Yahoo -->
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#yahoo">
+                                    <i class="bi bi-envelope-fill text-purple me-2"></i>
+                                    Yahoo Mail
+                                </button>
+                            </h2>
+                            <div id="yahoo" class="accordion-collapse collapse" data-bs-parent="#smtpGuide">
+                                <div class="accordion-body">
+                                    <strong>الإعدادات:</strong>
+                                    <ul class="list-unstyled">
+                                        <li><strong>خادم SMTP:</strong> smtp.mail.yahoo.com</li>
+                                        <li><strong>المنفذ:</strong> 587 أو 465</li>
+                                        <li><strong>الأمان:</strong> TLS/SSL</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function testConnection() {
+    const button = event.target;
+    const originalText = button.innerHTML;
+    
+    // تعطيل الزر وإظهار التحميل
+    button.disabled = true;
+    button.innerHTML = '<i class="bi bi-arrow-repeat spin"></i> جاري الاختبار...';
+    
+    // جمع بيانات النموذج
+    const formData = new FormData();
+    formData.append('smtp_server', document.getElementById('smtp_server').value);
+    formData.append('smtp_port', document.getElementById('smtp_port').value);
+    formData.append('smtp_username', document.getElementById('smtp_username').value);
+    formData.append('smtp_password', document.getElementById('smtp_password').value);
+    
+    // محاكاة اختبار الاتصال (يمكن تطويرها لاحقاً)
+    setTimeout(() => {
+        const server = document.getElementById('smtp_server').value;
+        const port = document.getElementById('smtp_port').value;
+        
+        if (server && port) {
+            showMessage('تم اختبار الاتصال بنجاح!', 'success');
+        } else {
+            showMessage('يرجى ملء جميع الحقول المطلوبة', 'error');
+        }
+        
+        // إعادة تفعيل الزر
+        button.disabled = false;
+        button.innerHTML = originalText;
+    }, 2000);
+}
+
+// إضافة فئة spin للأيقونة
+document.head.insertAdjacentHTML('beforeend', `
+<style>
+.spin {
+    animation: spin 1s linear infinite;
+}
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+</style>
+`);
+</script>
+{% endblock %}

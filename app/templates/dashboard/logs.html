@@ -1,0 +1,509 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="dashboard-card">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <h2 class="text-gradient mb-2">
+                            <i class="bi bi-clock-history"></i>
+                            سجل الرسائل
+                        </h2>
+                        <p class="text-muted mb-0">متابعة وتتبع جميع الرسائل المرسلة</p>
+                    </div>
+                    <div class="col-md-4 text-end">
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-outline-primary" onclick="exportData('logs')">
+                                <i class="bi bi-download"></i> تصدير
+                            </button>
+                            <button class="btn btn-outline-secondary" onclick="refreshLogs()">
+                                <i class="bi bi-arrow-clockwise"></i> تحديث
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- مرشحات البحث والتصفية -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card dashboard-card">
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <label class="form-label">البحث:</label>
+                            <input type="text" class="form-control" id="searchInput" 
+                                   placeholder="بحث في البريد أو الموضوع...">
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">الحالة:</label>
+                            <select class="form-select" id="statusFilter">
+                                <option value="">جميع الحالات</option>
+                                <option value="sent">تم الإرسال</option>
+                                <option value="failed">فشل</option>
+                                <option value="pending">في الانتظار</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">نوع الخدمة:</label>
+                            <select class="form-select" id="serviceFilter">
+                                <option value="">جميع الخدمات</option>
+                                <option value="1">كود التحقق</option>
+                                <option value="2">تفاصيل الطلبات</option>
+                                <option value="3">رسائل ترحيبية</option>
+                                <option value="4">رسائل عامة</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">من تاريخ:</label>
+                            <input type="date" class="form-control" id="dateFrom">
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">إلى تاريخ:</label>
+                            <input type="date" class="form-control" id="dateTo">
+                        </div>
+                        <div class="col-md-1 d-flex align-items-end">
+                            <button class="btn btn-primary w-100" onclick="applyFilters()">
+                                <i class="bi bi-funnel"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- إحصائيات سريعة -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card text-center border-success">
+                <div class="card-body">
+                    <i class="bi bi-check-circle text-success" style="font-size: 2rem;"></i>
+                    <h4 class="text-success mt-2" id="sentCount">
+                        {{ logs.items | selectattr('status', 'equalto', 'sent') | list | length }}
+                    </h4>
+                    <small class="text-muted">تم الإرسال</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center border-danger">
+                <div class="card-body">
+                    <i class="bi bi-x-circle text-danger" style="font-size: 2rem;"></i>
+                    <h4 class="text-danger mt-2" id="failedCount">
+                        {{ logs.items | selectattr('status', 'equalto', 'failed') | list | length }}
+                    </h4>
+                    <small class="text-muted">فشل</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center border-warning">
+                <div class="card-body">
+                    <i class="bi bi-clock text-warning" style="font-size: 2rem;"></i>
+                    <h4 class="text-warning mt-2" id="pendingCount">
+                        {{ logs.items | selectattr('status', 'equalto', 'pending') | list | length }}
+                    </h4>
+                    <small class="text-muted">في الانتظار</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center border-info">
+                <div class="card-body">
+                    <i class="bi bi-envelope text-info" style="font-size: 2rem;"></i>
+                    <h4 class="text-info mt-2" id="totalCount">{{ logs.total }}</h4>
+                    <small class="text-muted">إجمالي الرسائل</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- جدول السجلات -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card dashboard-card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="bi bi-table"></i>
+                        سجل الرسائل المرسلة
+                    </h5>
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="text-muted small">عرض {{ logs.per_page }} من أصل {{ logs.total }}</span>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    {% if logs.items %}
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0" id="logsTable">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>المستقبل</th>
+                                    <th>الموضوع</th>
+                                    <th>نوع الخدمة</th>
+                                    <th>القالب</th>
+                                    <th>الحالة</th>
+                                    <th>التاريخ والوقت</th>
+                                    <th>التكلفة</th>
+                                    <th>الإجراءات</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for log in logs.items %}
+                                <tr data-status="{{ log.status }}" data-service="{{ log.service_id }}" 
+                                    data-date="{{ log.sent_at.strftime('%Y-%m-%d') }}">
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <i class="bi bi-envelope me-2 text-primary"></i>
+                                            <div>
+                                                <div class="fw-bold">{{ log.recipient_email }}</div>
+                                                {% if log.error_message %}
+                                                <small class="text-danger">{{ log.error_message[:50] }}...</small>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="text-truncate d-inline-block" style="max-width: 200px;" 
+                                              title="{{ log.subject }}">
+                                            {{ log.subject }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="badge" style="background-color: 
+                                            {% if log.service_id == 1 %}#007bff
+                                            {% elif log.service_id == 2 %}#28a745
+                                            {% elif log.service_id == 3 %}#dc3545
+                                            {% else %}#6c757d{% endif %};">
+                                            {{ log.service_rel.service_name }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        {% if log.template %}
+                                            <span class="text-info">{{ log.template.template_name }}</span>
+                                        {% else %}
+                                            <span class="text-muted">قالب افتراضي</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if log.status == 'sent' %}
+                                            <span class="badge bg-success">
+                                                <i class="bi bi-check-circle"></i> تم الإرسال
+                                            </span>
+                                        {% elif log.status == 'failed' %}
+                                            <span class="badge bg-danger">
+                                                <i class="bi bi-x-circle"></i> فشل
+                                            </span>
+                                        {% else %}
+                                            <span class="badge bg-warning">
+                                                <i class="bi bi-clock"></i> في الانتظار
+                                            </span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <div class="text-nowrap">
+                                            <div>{{ log.sent_at.strftime('%Y-%m-%d') }}</div>
+                                            <small class="text-muted">{{ log.sent_at.strftime('%H:%M:%S') }}</small>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        {% if log.was_free %}
+                                            <span class="badge bg-success">مجانية</span>
+                                        {% else %}
+                                            <span class="text-warning fw-bold">{{ "%.2f"|format(log.cost) }} ج</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <div class="btn-group" role="group">
+                                            <button class="btn btn-sm btn-outline-info" 
+                                                    onclick="viewLogDetails({{ log.id }})" 
+                                                    title="عرض التفاصيل">
+                                                <i class="bi bi-eye"></i>
+                                            </button>
+                                            {% if log.status == 'failed' %}
+                                            <button class="btn btn-sm btn-outline-warning" 
+                                                    onclick="retryEmail({{ log.id }})" 
+                                                    title="إعادة الإرسال">
+                                                <i class="bi bi-arrow-clockwise"></i>
+                                            </button>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Pagination -->
+                    {% if logs.pages > 1 %}
+                    <div class="card-footer">
+                        <nav aria-label="تصفح الصفحات">
+                            <ul class="pagination justify-content-center mb-0">
+                                {% if logs.has_prev %}
+                                <li class="page-item">
+                                    <a class="page-link" href="{{ url_for('dashboard.logs', page=logs.prev_num) }}">
+                                        <i class="bi bi-chevron-right"></i>
+                                    </a>
+                                </li>
+                                {% endif %}
+                                
+                                {% for page_num in logs.iter_pages() %}
+                                    {% if page_num %}
+                                        {% if page_num != logs.page %}
+                                        <li class="page-item">
+                                            <a class="page-link" href="{{ url_for('dashboard.logs', page=page_num) }}">
+                                                {{ page_num }}
+                                            </a>
+                                        </li>
+                                        {% else %}
+                                        <li class="page-item active">
+                                            <span class="page-link">{{ page_num }}</span>
+                                        </li>
+                                        {% endif %}
+                                    {% else %}
+                                    <li class="page-item disabled">
+                                        <span class="page-link">...</span>
+                                    </li>
+                                    {% endif %}
+                                {% endfor %}
+                                
+                                {% if logs.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="{{ url_for('dashboard.logs', page=logs.next_num) }}">
+                                        <i class="bi bi-chevron-left"></i>
+                                    </a>
+                                </li>
+                                {% endif %}
+                            </ul>
+                        </nav>
+                    </div>
+                    {% endif %}
+
+                    {% else %}
+                    <!-- حالة عدم وجود سجلات -->
+                    <div class="text-center py-5">
+                        <i class="bi bi-inbox text-muted" style="font-size: 4rem;"></i>
+                        <h5 class="text-muted mt-3">لا توجد رسائل في السجل</h5>
+                        <p class="text-muted">ابدأ بإرسال رسائلك لترى السجل هنا</p>
+                        <a href="{{ url_for('main.documentation') }}" class="btn btn-primary">
+                            <i class="bi bi-book"></i> اقرأ التوثيق
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal لعرض تفاصيل الرسالة -->
+<div class="modal fade" id="logDetailsModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">تفاصيل الرسالة</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="logDetailsContent">
+                <!-- سيتم تحميل المحتوى هنا -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إغلاق</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// تطبيق المرشحات
+function applyFilters() {
+    const search = document.getElementById('searchInput').value.toLowerCase();
+    const status = document.getElementById('statusFilter').value;
+    const service = document.getElementById('serviceFilter').value;
+    const dateFrom = document.getElementById('dateFrom').value;
+    const dateTo = document.getElementById('dateTo').value;
+    
+    const rows = document.querySelectorAll('#logsTable tbody tr');
+    let visibleCount = 0;
+    let sentCount = 0, failedCount = 0, pendingCount = 0;
+    
+    rows.forEach(row => {
+        let show = true;
+        
+        // فلتر البحث
+        if (search) {
+            const email = row.querySelector('td:first-child').textContent.toLowerCase();
+            const subject = row.querySelector('td:nth-child(2)').textContent.toLowerCase();
+            if (!email.includes(search) && !subject.includes(search)) {
+                show = false;
+            }
+        }
+        
+        // فلتر الحالة
+        if (status && row.dataset.status !== status) {
+            show = false;
+        }
+        
+        // فلتر نوع الخدمة
+        if (service && row.dataset.service !== service) {
+            show = false;
+        }
+        
+        // فلتر التاريخ
+        const rowDate = row.dataset.date;
+        if (dateFrom && rowDate < dateFrom) {
+            show = false;
+        }
+        if (dateTo && rowDate > dateTo) {
+            show = false;
+        }
+        
+        // عرض/إخفاء الصف
+        row.style.display = show ? '' : 'none';
+        
+        if (show) {
+            visibleCount++;
+            const rowStatus = row.dataset.status;
+            if (rowStatus === 'sent') sentCount++;
+            else if (rowStatus === 'failed') failedCount++;
+            else if (rowStatus === 'pending') pendingCount++;
+        }
+    });
+    
+    // تحديث العدادات
+    document.getElementById('sentCount').textContent = sentCount;
+    document.getElementById('failedCount').textContent = failedCount;
+    document.getElementById('pendingCount').textContent = pendingCount;
+    document.getElementById('totalCount').textContent = visibleCount;
+    
+    showMessage(`تم العثور على ${visibleCount} نتيجة`, 'info');
+}
+
+// إعادة تعيين المرشحات
+function resetFilters() {
+    document.getElementById('searchInput').value = '';
+    document.getElementById('statusFilter').value = '';
+    document.getElementById('serviceFilter').value = '';
+    document.getElementById('dateFrom').value = '';
+    document.getElementById('dateTo').value = '';
+    
+    applyFilters();
+}
+
+// عرض تفاصيل الرسالة
+function viewLogDetails(logId) {
+    // محاكاة تحميل البيانات
+    const modalContent = document.getElementById('logDetailsContent');
+    modalContent.innerHTML = `
+        <div class="text-center">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">جاري التحميل...</span>
+            </div>
+        </div>
+    `;
+    
+    const modal = new bootstrap.Modal(document.getElementById('logDetailsModal'));
+    modal.show();
+    
+    // محاكاة API call
+    setTimeout(() => {
+        modalContent.innerHTML = `
+            <div class="row">
+                <div class="col-md-6">
+                    <h6>معلومات الرسالة:</h6>
+                    <p><strong>المعرف:</strong> #${logId}</p>
+                    <p><strong>البريد المستقبل:</strong> example@domain.com</p>
+                    <p><strong>الموضوع:</strong> كود التحقق</p>
+                    <p><strong>نوع الخدمة:</strong> كود التحقق</p>
+                </div>
+                <div class="col-md-6">
+                    <h6>معلومات الإرسال:</h6>
+                    <p><strong>الحالة:</strong> <span class="badge bg-success">تم الإرسال</span></p>
+                    <p><strong>وقت الإرسال:</strong> ${new Date().toLocaleString('ar-EG')}</p>
+                    <p><strong>التكلفة:</strong> 0.25 جنيه</p>
+                    <p><strong>معرف الرسالة:</strong> msg_${Math.random().toString(36).substr(2, 9)}</p>
+                </div>
+            </div>
+            <hr>
+            <h6>محتوى الرسالة:</h6>
+            <div style="max-height: 300px; overflow-y: auto; border: 1px solid #dee2e6; padding: 15px; border-radius: 5px;">
+                <p>تم إرسال رسالة تحتوي على كود تحقق للمستخدم.</p>
+            </div>
+        `;
+    }, 1000);
+}
+
+// إعادة إرسال الرسالة
+function retryEmail(logId) {
+    if (confirm('هل تريد إعادة إرسال هذه الرسالة؟')) {
+        const button = event.target.closest('button');
+        setLoading(button, true);
+        
+        // محاكاة إعادة الإرسال
+        setTimeout(() => {
+            showMessage('تم إعادة إرسال الرسالة بنجاح!', 'success');
+            setLoading(button, false);
+            
+            // تحديث الصفحة بعد ثانيتين
+            setTimeout(() => {
+                location.reload();
+            }, 2000);
+        }, 2000);
+    }
+}
+
+// تحديث السجلات
+function refreshLogs() {
+    showMessage('جاري تحديث السجلات...', 'info');
+    setTimeout(() => {
+        location.reload();
+    }, 1000);
+}
+
+// تهيئة الصفحة
+document.addEventListener('DOMContentLoaded', function() {
+    // ربط أحداث البحث والتصفية
+    const searchInput = document.getElementById('searchInput');
+    const filters = ['statusFilter', 'serviceFilter', 'dateFrom', 'dateTo'];
+    
+    // البحث الفوري
+    searchInput.addEventListener('input', debounce(applyFilters, 300));
+    
+    // تطبيق المرشحات عند التغيير
+    filters.forEach(filterId => {
+        const element = document.getElementById(filterId);
+        if (element) {
+            element.addEventListener('change', applyFilters);
+        }
+    });
+    
+    // تعيين التاريخ الافتراضي (آخر 30 يوم)
+    const today = new Date();
+    const thirtyDaysAgo = new Date(today.getTime() - (30 * 24 * 60 * 60 * 1000));
+    
+    document.getElementById('dateFrom').value = thirtyDaysAgo.toISOString().split('T')[0];
+    document.getElementById('dateTo').value = today.toISOString().split('T')[0];
+});
+
+// دالة debounce لتحسين الأداء
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
+</script>
+{% endblock %}

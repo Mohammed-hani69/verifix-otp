@@ -1,0 +1,571 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="hero-section text-center text-white py-5 mb-0">
+    <div class="container">
+        <h1 class="display-4 fw-bold mb-4">
+            <i class="bi bi-tag"></i>
+            الأسعار والخطط
+        </h1>
+        <p class="lead">
+            اختر الخطة المناسبة لاحتياجاتك مع أسعار تنافسية ومرونة كاملة
+        </p>
+    </div>
+</div>
+
+<div class="container my-5">
+    <!-- مقارنة الخطط -->
+    <div class="row justify-content-center mb-5">
+        <div class="col-lg-4 col-md-6 mb-4">
+            <div class="card h-100 border-primary">
+                <div class="card-header text-center bg-primary text-white">
+                    <h4 class="mb-0">خطة مجانية</h4>
+                    <p class="mb-0 small">للتجربة والاختبار</p>
+                </div>
+                <div class="card-body text-center">
+                    <div class="display-4 fw-bold text-primary mb-3">
+                        مجاناً
+                    </div>
+                    <p class="text-muted mb-4">
+                        <strong>{{ free_limit }}</strong> رسالة مجانية عند التسجيل
+                    </p>
+                    
+                    <ul class="list-unstyled mb-4">
+                        <li class="mb-2">
+                            <i class="bi bi-check-circle text-success me-2"></i>
+                            {{ free_limit }} رسالة مجانية
+                        </li>
+                        <li class="mb-2">
+                            <i class="bi bi-check-circle text-success me-2"></i>
+                            جميع أنواع الخدمات
+                        </li>
+                        <li class="mb-2">
+                            <i class="bi bi-check-circle text-success me-2"></i>
+                            قوالب افتراضية
+                        </li>
+                        <li class="mb-2">
+                            <i class="bi bi-check-circle text-success me-2"></i>
+                            دعم فني أساسي
+                        </li>
+                        <li class="mb-2">
+                            <i class="bi bi-x-circle text-muted me-2"></i>
+                            قوالب مخصصة
+                        </li>
+                        <li class="mb-2">
+                            <i class="bi bi-x-circle text-muted me-2"></i>
+                            إزالة العلامة المائية
+                        </li>
+                    </ul>
+                    
+                    {% if not current_user.is_authenticated %}
+                    <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-lg w-100">
+                        ابدأ مجاناً
+                    </a>
+                    {% else %}
+                    <button class="btn btn-outline-primary btn-lg w-100" disabled>
+                        خطتك الحالية
+                    </button>
+                    {% endif %}
+                </div>
+                <div class="card-footer bg-transparent text-center">
+                    <small class="text-muted">
+                        <i class="bi bi-info-circle"></i>
+                        تظهر علامة {{ config.COMPANY_NAME }} في نهاية الرسائل
+                    </small>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4 col-md-6 mb-4">
+            <div class="card h-100 border-success position-relative">
+                <div class="badge bg-success position-absolute top-0 start-50 translate-middle px-3 py-2">
+                    الأكثر شعبية
+                </div>
+                <div class="card-header text-center bg-success text-white">
+                    <h4 class="mb-0">خطة مدفوعة</h4>
+                    <p class="mb-0 small">للاستخدام التجاري</p>
+                </div>
+                <div class="card-body text-center">
+                    <div class="display-4 fw-bold text-success mb-1">
+                        {{ "%.2f"|format(message_price) }}
+                    </div>
+                    <p class="text-muted mb-4">جنيه لكل رسالة</p>
+                    
+                    <div class="alert alert-light mb-4">
+                        <div class="row text-center">
+                            <div class="col-6">
+                                <h5 class="text-success">100 ج</h5>
+                                <small>{{ (100 / message_price)|int }} رسالة</small>
+                            </div>
+                            <div class="col-6">
+                                <h5 class="text-success">500 ج</h5>
+                                <small>{{ (500 / message_price)|int }} رسالة</small>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <ul class="list-unstyled mb-4">
+                        <li class="mb-2">
+                            <i class="bi bi-check-circle text-success me-2"></i>
+                            رسائل غير محدودة
+                        </li>
+                        <li class="mb-2">
+                            <i class="bi bi-check-circle text-success me-2"></i>
+                            جميع أنواع الخدمات
+                        </li>
+                        <li class="mb-2">
+                            <i class="bi bi-check-circle text-success me-2"></i>
+                            قوالب مخصصة متقدمة
+                        </li>
+                        <li class="mb-2">
+                            <i class="bi bi-check-circle text-success me-2"></i>
+                            إزالة العلامة المائية
+                        </li>
+                        <li class="mb-2">
+                            <i class="bi bi-check-circle text-success me-2"></i>
+                            رفع الشعار الخاص
+                        </li>
+                        <li class="mb-2">
+                            <i class="bi bi-check-circle text-success me-2"></i>
+                            دعم فني متقدم
+                        </li>
+                        <li class="mb-2">
+                            <i class="bi bi-check-circle text-success me-2"></i>
+                            إحصائيات مفصلة
+                        </li>
+                    </ul>
+                    
+                    {% if current_user.is_authenticated %}
+                    <a href="{{ url_for('dashboard.balance') }}" class="btn btn-success btn-lg w-100">
+                        شحن الرصيد
+                    </a>
+                    {% else %}
+                    <a href="{{ url_for('auth.register') }}" class="btn btn-success btn-lg w-100">
+                        ابدأ الآن
+                    </a>
+                    {% endif %}
+                </div>
+                <div class="card-footer bg-transparent text-center">
+                    <small class="text-muted">
+                        <i class="bi bi-shield-check"></i>
+                        لا توجد رسوم خفية أو اشتراكات شهرية
+                    </small>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4 col-md-6 mb-4">
+            <div class="card h-100 border-warning">
+                <div class="card-header text-center bg-warning text-dark">
+                    <h4 class="mb-0">خطة مؤسسية</h4>
+                    <p class="mb-0 small">للشركات الكبيرة</p>
+                </div>
+                <div class="card-body text-center">
+                    <div class="display-4 fw-bold text-warning mb-3">
+                        مخصص
+                    </div>
+                    <p class="text-muted mb-4">أسعار خاصة حسب الحجم</p>
+                    
+                    <ul class="list-unstyled mb-4">
+                        <li class="mb-2">
+                            <i class="bi bi-check-circle text-success me-2"></i>
+                            كل مميزات الخطة المدفوعة
+                        </li>
+                        <li class="mb-2">
+                            <i class="bi bi-check-circle text-success me-2"></i>
+                            أسعار مخفضة للكميات الكبيرة
+                        </li>
+                        <li class="mb-2">
+                            <i class="bi bi-check-circle text-success me-2"></i>
+                            مدير حساب مخصص
+                        </li>
+                        <li class="mb-2">
+                            <i class="bi bi-check-circle text-success me-2"></i>
+                            دعم فني 24/7
+                        </li>
+                        <li class="mb-2">
+                            <i class="bi bi-check-circle text-success me-2"></i>
+                            تكامل مخصص
+                        </li>
+                        <li class="mb-2">
+                            <i class="bi bi-check-circle text-success me-2"></i>
+                            SLA مضمون
+                        </li>
+                        <li class="mb-2">
+                            <i class="bi bi-check-circle text-success me-2"></i>
+                            تقارير تفصيلية
+                        </li>
+                    </ul>
+                    
+                    <a href="{{ url_for('main.contact') }}" class="btn btn-warning btn-lg w-100">
+                        تواصل معنا
+                    </a>
+                </div>
+                <div class="card-footer bg-transparent text-center">
+                    <small class="text-muted">
+                        <i class="bi bi-telephone"></i>
+                        للشركات التي ترسل أكثر من 10,000 رسالة شهرياً
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- حاسبة التكلفة -->
+    <div class="row justify-content-center mb-5">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header text-center">
+                    <h3 class="mb-0">
+                        <i class="bi bi-calculator"></i>
+                        حاسبة التكلفة
+                    </h3>
+                    <p class="mb-0 text-muted">احسب تكلفة إرسال رسائلك الشهرية</p>
+                </div>
+                <div class="card-body">
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">عدد الرسائل المتوقعة شهرياً:</label>
+                            <input type="number" class="form-control form-control-lg text-center" 
+                                   id="messagesCount" value="1000" min="1" max="1000000">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">التكلفة الشهرية المتوقعة:</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-success text-white fw-bold" id="monthlyCost">
+                                    {{ "%.2f"|format(1000 * message_price) }}
+                                </span>
+                                <span class="input-group-text">جنيه</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <hr class="my-4">
+                    
+                    <div class="row text-center">
+                        <div class="col-md-3">
+                            <div class="bg-light p-3 rounded">
+                                <h5 class="text-primary" id="dailyCost">{{ "%.2f"|format((1000 * message_price) / 30) }}</h5>
+                                <small class="text-muted">تكلفة يومية</small>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="bg-light p-3 rounded">
+                                <h5 class="text-success" id="weeklyCost">{{ "%.2f"|format((1000 * message_price) / 4) }}</h5>
+                                <small class="text-muted">تكلفة أسبوعية</small>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="bg-light p-3 rounded">
+                                <h5 class="text-info" id="yearlyCost">{{ "%.2f"|format(1000 * message_price * 12) }}</h5>
+                                <small class="text-muted">تكلفة سنوية</small>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="bg-light p-3 rounded">
+                                <h5 class="text-warning" id="savingsPercent">0%</h5>
+                                <small class="text-muted">توفير مقارنة بالمنافسين</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- مقارنة مع المنافسين -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header text-center">
+                    <h3 class="mb-0">
+                        <i class="bi bi-graph-up"></i>
+                        مقارنة الأسعار مع المنافسين
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>الخدمة</th>
+                                    <th>سعر الرسالة</th>
+                                    <th>الحد الأدنى الشهري</th>
+                                    <th>قوالب مخصصة</th>
+                                    <th>دعم فني</th>
+                                    <th>رسائل مجانية</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="table-success">
+                                    <td>
+                                        <strong>{{ config.COMPANY_NAME }}</strong>
+                                        <span class="badge bg-success ms-2">خدمتنا</span>
+                                    </td>
+                                    <td><strong>{{ "%.3f"|format(message_price) }} ج</strong></td>
+                                    <td><strong>لا يوجد</strong></td>
+                                    <td><i class="bi bi-check-circle text-success"></i></td>
+                                    <td><i class="bi bi-check-circle text-success"></i></td>
+                                    <td><strong>{{ free_limit }}</strong></td>
+                                </tr>
+                                <tr>
+                                    <td>المنافس الأول</td>
+                                    <td>0.35 ج</td>
+                                    <td>100 ج شهرياً</td>
+                                    <td><i class="bi bi-x-circle text-danger"></i></td>
+                                    <td><i class="bi bi-check-circle text-success"></i></td>
+                                    <td>100</td>
+                                </tr>
+                                <tr>
+                                    <td>المنافس الثاني</td>
+                                    <td>0.40 ج</td>
+                                    <td>200 ج شهرياً</td>
+                                    <td><i class="bi bi-check-circle text-success"></i></td>
+                                    <td><i class="bi bi-dash-circle text-warning"></i></td>
+                                    <td>50</td>
+                                </tr>
+                                <tr>
+                                    <td>المنافس الثالث</td>
+                                    <td>0.30 ج</td>
+                                    <td>500 ج شهرياً</td>
+                                    <td><i class="bi bi-check-circle text-success"></i></td>
+                                    <td><i class="bi bi-check-circle text-success"></i></td>
+                                    <td>0</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="alert alert-success">
+                        <i class="bi bi-award"></i>
+                        <strong>لماذا نحن الأفضل؟</strong>
+                        <ul class="mb-0 mt-2">
+                            <li>أسعار تنافسية بدون حد أدنى شهري</li>
+                            <li>رسائل مجانية أكثر من أي منافس</li>
+                            <li>قوالب مخصصة متقدمة مجاناً</li>
+                            <li>دعم فني متميز باللغة العربية</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- الأسئلة الشائعة -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header text-center">
+                    <h3 class="mb-0">
+                        <i class="bi bi-question-circle"></i>
+                        أسئلة شائعة حول الأسعار
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <div class="accordion" id="pricingFAQ">
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="faq1">
+                                <button class="accordion-button" type="button" data-bs-toggle="collapse" 
+                                        data-bs-target="#collapse1">
+                                    هل هناك رسوم خفية أو اشتراكات شهرية؟
+                                </button>
+                            </h2>
+                            <div id="collapse1" class="accordion-collapse collapse show" data-bs-parent="#pricingFAQ">
+                                <div class="accordion-body">
+                                    لا، لا توجد أي رسوم خفية أو اشتراكات شهرية. تدفع فقط مقابل الرسائل التي ترسلها 
+                                    بسعر {{ "%.2f"|format(message_price) }} جنيه لكل رسالة.
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="faq2">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" 
+                                        data-bs-target="#collapse2">
+                                    متى تنتهي صلاحية الرسائل المجانية؟
+                                </button>
+                            </h2>
+                            <div id="collapse2" class="accordion-collapse collapse" data-bs-parent="#pricingFAQ">
+                                <div class="accordion-body">
+                                    الرسائل المجانية لا تنتهي صلاحيتها أبداً. يمكنك استخدام {{ free_limit }} رسالة 
+                                    مجانية في أي وقت تشاء بدون قيود زمنية.
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="faq3">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" 
+                                        data-bs-target="#collapse3">
+                                    هل يمكنني الحصول على خصم للكميات الكبيرة؟
+                                </button>
+                            </h2>
+                            <div id="collapse3" class="accordion-collapse collapse" data-bs-parent="#pricingFAQ">
+                                <div class="accordion-body">
+                                    نعم، نوفر خصومات مميزة للشركات التي تحتاج إرسال أكثر من 10,000 رسالة شهرياً. 
+                                    تواصل معنا للحصول على عرض خاص.
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="faq4">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" 
+                                        data-bs-target="#collapse4">
+                                    ما هي طرق الدفع المتاحة؟
+                                </button>
+                            </h2>
+                            <div id="collapse4" class="accordion-collapse collapse" data-bs-parent="#pricingFAQ">
+                                <div class="accordion-body">
+                                    نقبل جميع طرق الدفع الشائعة: فيزا، ماستركارد، فودافون كاش، والتحويل البنكي. 
+                                    عمليات الدفع آمنة ومشفرة بالكامل.
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="faq5">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" 
+                                        data-bs-target="#collapse5">
+                                    هل يمكنني ترقية أو تغيير خطتي؟
+                                </button>
+                            </h2>
+                            <div id="collapse5" class="accordion-collapse collapse" data-bs-parent="#pricingFAQ">
+                                <div class="accordion-body">
+                                    نعم، يمكنك ترقية حسابك في أي وقت بإضافة رصيد. لا توجد قيود أو رسوم على تغيير 
+                                    الخطة، والنظام مرن بالكامل حسب احتياجاتك.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- دعوة للعمل -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card bg-primary text-white text-center">
+                <div class="card-body py-5">
+                    <h2 class="fw-bold mb-3">جاهز للبدء؟</h2>
+                    <p class="lead mb-4">احصل على {{ free_limit }} رسالة مجانية الآن وابدأ رحلتك!</p>
+                    <div class="d-flex justify-content-center gap-3">
+                        {% if not current_user.is_authenticated %}
+                        <a href="{{ url_for('auth.register') }}" class="btn btn-light btn-lg">
+                            <i class="bi bi-person-plus"></i> إنشاء حساب مجاني
+                        </a>
+                        <a href="{{ url_for('main.contact') }}" class="btn btn-outline-light btn-lg">
+                            <i class="bi bi-telephone"></i> تواصل معنا
+                        </a>
+                        {% else %}
+                        <a href="{{ url_for('dashboard.balance') }}" class="btn btn-light btn-lg">
+                            <i class="bi bi-wallet2"></i> شحن الرصيد
+                        </a>
+                        <a href="{{ url_for('dashboard.index') }}" class="btn btn-outline-light btn-lg">
+                            <i class="bi bi-speedometer2"></i> لوحة التحكم
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// حاسبة التكلفة
+const MESSAGE_PRICE = {{ message_price }};
+
+function calculateCosts() {
+    const messagesCount = parseInt(document.getElementById('messagesCount').value) || 0;
+    
+    // التكلفة الشهرية
+    const monthlyCost = messagesCount * MESSAGE_PRICE;
+    document.getElementById('monthlyCost').textContent = monthlyCost.toFixed(2);
+    
+    // التكلفة اليومية
+    const dailyCost = monthlyCost / 30;
+    document.getElementById('dailyCost').textContent = dailyCost.toFixed(2);
+    
+    // التكلفة الأسبوعية
+    const weeklyCost = monthlyCost / 4;
+    document.getElementById('weeklyCost').textContent = weeklyCost.toFixed(2);
+    
+    // التكلفة السنوية
+    const yearlyCost = monthlyCost * 12;
+    document.getElementById('yearlyCost').textContent = yearlyCost.toFixed(0);
+    
+    // حساب نسبة التوفير (مقارنة بمتوسط سعر المنافسين 0.35)
+    const competitorPrice = 0.35;
+    const competitorCost = messagesCount * competitorPrice;
+    const savings = ((competitorCost - monthlyCost) / competitorCost * 100);
+    document.getElementById('savingsPercent').textContent = 
+        savings > 0 ? savings.toFixed(0) + '%' : '0%';
+}
+
+// ربط الحدث
+document.addEventListener('DOMContentLoaded', function() {
+    const messagesInput = document.getElementById('messagesCount');
+    messagesInput.addEventListener('input', calculateCosts);
+    
+    // تحديث الحسابات الأولية
+    calculateCosts();
+    
+    // تحديث الحسابات عند تغيير القيمة
+    messagesInput.addEventListener('change', function() {
+        // التأكد من أن القيمة صحيحة
+        if (this.value < 1) this.value = 1;
+        if (this.value > 1000000) this.value = 1000000;
+        calculateCosts();
+    });
+});
+
+// تأثيرات تفاعلية
+document.querySelectorAll('.card').forEach(card => {
+    card.addEventListener('mouseenter', function() {
+        this.style.transform = 'translateY(-5px)';
+    });
+    
+    card.addEventListener('mouseleave', function() {
+        this.style.transform = 'translateY(0)';
+    });
+});
+
+// أرقام متحركة للحاسبة
+function animateNumbers() {
+    const elements = ['monthlyCost', 'dailyCost', 'weeklyCost', 'yearlyCost'];
+    
+    elements.forEach(id => {
+        const element = document.getElementById(id);
+        const finalValue = parseFloat(element.textContent);
+        let currentValue = 0;
+        const increment = finalValue / 30;
+        
+        const counter = setInterval(() => {
+            currentValue += increment;
+            if (currentValue >= finalValue) {
+                element.textContent = finalValue.toFixed(2);
+                clearInterval(counter);
+            } else {
+                element.textContent = currentValue.toFixed(2);
+            }
+        }, 20);
+    });
+}
+
+// تشغيل الأرقام المتحركة عند التمرير للحاسبة
+const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            animateNumbers();
+            observer.unobserve(entry.target);
+        }
+    });
+});
+
+observer.observe(document.querySelector('.card:has(#messagesCount)'));
+</script>
+{% endblock %}

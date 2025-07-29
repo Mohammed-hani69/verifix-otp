@@ -1,0 +1,17 @@
+User-agent: *
+Allow: /
+Allow: /about
+Allow: /pricing
+Allow: /contact
+Allow: /docs
+Allow: /static/
+
+Disallow: /dashboard/
+Disallow: /auth/
+Disallow: /api/
+Disallow: /admin/
+Disallow: /*.env
+Disallow: /*.log
+Disallow: /uploads/
+
+Sitemap: https://verifix-otp.escovfair.com/sitemap.xml

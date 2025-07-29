@@ -1,0 +1,420 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="dashboard-card">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <h2 class="text-gradient mb-2">
+                            <i class="bi bi-person-circle"></i>
+                            الملف الشخصي
+                        </h2>
+                        <p class="text-muted mb-0">إدارة معلومات حسابك وإعداداتك الشخصية</p>
+                    </div>
+                    <div class="col-md-4 text-end">
+                        <a href="{{ url_for('dashboard.index') }}" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-right"></i> العودة للوحة التحكم
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- معلومات الحساب -->
+        <div class="col-lg-8">
+            <div class="card dashboard-card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-info-circle"></i>
+                        معلومات الحساب
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="profile-info-item mb-3">
+                                <label class="form-label fw-bold text-muted">اسم الشركة:</label>
+                                <div class="profile-value">{{ current_user.company_name }}</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="profile-info-item mb-3">
+                                <label class="form-label fw-bold text-muted">البريد الإلكتروني:</label>
+                                <div class="profile-value">{{ current_user.email }}</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="profile-info-item mb-3">
+                                <label class="form-label fw-bold text-muted">تاريخ التسجيل:</label>
+                                <div class="profile-value">{{ current_user.created_at.strftime('%Y-%m-%d %H:%M') }}</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="profile-info-item mb-3">
+                                <label class="form-label fw-bold text-muted">آخر تسجيل دخول:</label>
+                                <div class="profile-value">
+                                    {% if current_user.last_login %}
+                                        {{ current_user.last_login.strftime('%Y-%m-%d %H:%M') }}
+                                    {% else %}
+                                        لم يتم تسجيل الدخول من قبل
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="profile-info-item mb-3">
+                                <label class="form-label fw-bold text-muted">حالة الحساب:</label>
+                                <div class="profile-value">
+                                    {% if current_user.is_active %}
+                                        <span class="badge bg-success">نشط</span>
+                                    {% else %}
+                                        <span class="badge bg-danger">معطل</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="profile-info-item mb-3">
+                                <label class="form-label fw-bold text-muted">مفتاح API:</label>
+                                <div class="profile-value">
+                                    <code class="text-primary">{{ current_user.api_key[:8] }}***</code>
+                                    <a href="{{ url_for('dashboard.api_settings') }}" class="ms-2 text-decoration-none">
+                                        <i class="bi bi-gear"></i> إدارة
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- إحصائيات الاستخدام -->
+            <div class="card dashboard-card mt-4">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-graph-up"></i>
+                        إحصائيات الاستخدام
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="stat-item text-center p-3 bg-light rounded">
+                                <i class="bi bi-envelope display-4 text-primary"></i>
+                                <h4 class="mt-2 mb-1">{{ current_user.total_messages_sent }}</h4>
+                                <small class="text-muted">إجمالي الرسائل المرسلة</small>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="stat-item text-center p-3 bg-light rounded">
+                                <i class="bi bi-gift display-4 text-success"></i>
+                                <h4 class="mt-2 mb-1">{{ current_user.free_messages_used }}</h4>
+                                <small class="text-muted">الرسائل المجانية المستخدمة</small>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="stat-item text-center p-3 bg-light rounded">
+                                <i class="bi bi-currency-dollar display-4 text-warning"></i>
+                                <h4 class="mt-2 mb-1">{{ "%.2f"|format(current_user.balance) }}</h4>
+                                <small class="text-muted">الرصيد الحالي (جنيه)</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- إعدادات البريد الإلكتروني -->
+            <div class="card dashboard-card mt-4">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-envelope-gear"></i>
+                        إعدادات البريد الإلكتروني
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="profile-info-item mb-3">
+                                <label class="form-label fw-bold text-muted">خادم SMTP:</label>
+                                <div class="profile-value">
+                                    {% if current_user.smtp_server %}
+                                        {{ current_user.smtp_server }}:{{ current_user.smtp_port }}
+                                    {% else %}
+                                        <span class="text-muted">غير مُعد</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="profile-info-item mb-3">
+                                <label class="form-label fw-bold text-muted">البريد المرسل:</label>
+                                <div class="profile-value">
+                                    {% if current_user.sender_email %}
+                                        {{ current_user.sender_email }}
+                                    {% else %}
+                                        <span class="text-muted">غير مُعد</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="profile-info-item mb-3">
+                                <label class="form-label fw-bold text-muted">اسم المرسل:</label>
+                                <div class="profile-value">
+                                    {% if current_user.sender_name %}
+                                        {{ current_user.sender_name }}
+                                    {% else %}
+                                        <span class="text-muted">غير مُعد</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="profile-info-item mb-3">
+                                <label class="form-label fw-bold text-muted">حالة الإعداد:</label>
+                                <div class="profile-value">
+                                    {% if current_user.smtp_server and current_user.sender_email %}
+                                        <span class="badge bg-success">مكتمل</span>
+                                    {% else %}
+                                        <span class="badge bg-warning">غير مكتمل</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{{ url_for('auth.email_settings') }}" class="btn btn-outline-primary">
+                            <i class="bi bi-gear"></i> تعديل الإعدادات
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- إجراءات سريعة -->
+        <div class="col-lg-4">
+            <div class="card dashboard-card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-lightning"></i>
+                        إجراءات سريعة
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a href="{{ url_for('auth.change_password') }}" class="btn btn-outline-primary">
+                            <i class="bi bi-shield-lock"></i> تغيير كلمة المرور
+                        </a>
+                        <a href="{{ url_for('auth.email_settings') }}" class="btn btn-outline-secondary">
+                            <i class="bi bi-envelope-gear"></i> إعدادات البريد
+                        </a>
+                        <a href="{{ url_for('dashboard.api_settings') }}" class="btn btn-outline-info">
+                            <i class="bi bi-key"></i> إعدادات API
+                        </a>
+                        <a href="{{ url_for('dashboard.balance') }}" class="btn btn-outline-success">
+                            <i class="bi bi-currency-dollar"></i> إدارة الرصيد
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- نشاط الحساب -->
+            <div class="card dashboard-card mt-3">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-activity"></i>
+                        نشاط الحساب
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="activity-timeline">
+                        <div class="activity-item">
+                            <i class="bi bi-person-check-fill text-success"></i>
+                            <div class="activity-content">
+                                <strong>تم إنشاء الحساب</strong>
+                                <small class="d-block text-muted">{{ current_user.created_at.strftime('%Y-%m-%d') }}</small>
+                            </div>
+                        </div>
+                        
+                        {% if current_user.last_login %}
+                        <div class="activity-item">
+                            <i class="bi bi-box-arrow-in-right text-primary"></i>
+                            <div class="activity-content">
+                                <strong>آخر تسجيل دخول</strong>
+                                <small class="d-block text-muted">{{ current_user.last_login.strftime('%Y-%m-%d %H:%M') }}</small>
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                        {% if current_user.total_messages_sent > 0 %}
+                        <div class="activity-item">
+                            <i class="bi bi-envelope-check text-info"></i>
+                            <div class="activity-content">
+                                <strong>آخر رسالة مرسلة</strong>
+                                <small class="d-block text-muted">{{ current_user.total_messages_sent }} رسالة إجمالاً</small>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- معلومات النظام -->
+            <div class="card dashboard-card mt-3">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-info-square"></i>
+                        معلومات النظام
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="system-info">
+                        <div class="info-row">
+                            <span class="info-label">إصدار النظام:</span>
+                            <span class="info-value">1.0.0</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">آخر تحديث:</span>
+                            <span class="info-value">2025-01-01</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">حالة الخدمة:</span>
+                            <span class="info-value">
+                                <span class="badge bg-success pulse">نشط</span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<style>
+.profile-value {
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: #495057;
+    padding: 8px 12px;
+    background-color: #f8f9fa;
+    border-radius: 6px;
+    border-left: 3px solid #6c757d;
+}
+
+.stat-item {
+    transition: transform 0.2s ease-in-out;
+}
+
+.stat-item:hover {
+    transform: translateY(-2px);
+}
+
+.activity-timeline {
+    position: relative;
+}
+
+.activity-item {
+    display: flex;
+    align-items-start;
+    margin-bottom: 15px;
+    padding-left: 15px;
+    position: relative;
+}
+
+.activity-item:before {
+    content: '';
+    position: absolute;
+    left: 14px;
+    top: 30px;
+    bottom: -15px;
+    width: 1px;
+    background-color: #dee2e6;
+}
+
+.activity-item:last-child:before {
+    display: none;
+}
+
+.activity-item i {
+    margin-right: 10px;
+    font-size: 1.2rem;
+    width: 24px;
+    text-align: center;
+}
+
+.activity-content {
+    flex: 1;
+}
+
+.system-info .info-row {
+    display: flex;
+    justify-content: between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid #f1f1f1;
+}
+
+.system-info .info-row:last-child {
+    border-bottom: none;
+}
+
+.system-info .info-label {
+    font-weight: 500;
+    color: #6c757d;
+}
+
+.system-info .info-value {
+    font-weight: 600;
+    color: #495057;
+}
+
+.pulse {
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(40, 167, 69, 0.7);
+    }
+    70% {
+        box-shadow: 0 0 0 10px rgba(40, 167, 69, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(40, 167, 69, 0);
+    }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // إضافة تأثيرات hover للإحصائيات
+    const statItems = document.querySelectorAll('.stat-item');
+    statItems.forEach(item => {
+        item.addEventListener('mouseenter', function() {
+            this.style.backgroundColor = '#e9ecef';
+        });
+        
+        item.addEventListener('mouseleave', function() {
+            this.style.backgroundColor = '#f8f9fa';
+        });
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,435 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="dashboard-card">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <h2 class="text-gradient mb-2">
+                            <i class="bi bi-key"></i>
+                            إعدادات API
+                        </h2>
+                        <p class="text-muted mb-0">إدارة مفتاح API الخاص بك وإعدادات الاتصال</p>
+                    </div>
+                    <div class="col-md-4 text-end">
+                        <a href="{{ url_for('dashboard.index') }}" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-right"></i> العودة للوحة التحكم
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- معلومات API -->
+        <div class="col-lg-8">
+            <div class="card dashboard-card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-shield-check"></i>
+                        مفتاح API الخاص بك
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle"></i>
+                        <strong>مهم:</strong> احتفظ بمفتاح API في مكان آمن ولا تشاركه مع أي شخص آخر.
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-8">
+                            <label class="form-label fw-bold">مفتاح API:</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control font-monospace" 
+                                       value="{{ current_user.api_key }}" readonly>
+                                <button class="btn btn-outline-secondary" type="button" 
+                                        data-copy-api-key="{{ current_user.api_key }}">
+                                    <i class="bi bi-clipboard"></i> نسخ
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-md-4 d-flex align-items-end">
+                            <a href="{{ url_for('auth.regenerate_api_key') }}" 
+                               class="btn btn-warning w-100" 
+                               data-regenerate-api>
+                                <i class="bi bi-arrow-clockwise"></i> إعادة إنشاء
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <hr>
+                    
+                    <h6 class="fw-bold mb-3">معلومات الاستخدام:</h6>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="bg-light p-3 rounded">
+                                <h5 class="text-primary">{{ current_user.total_messages_sent }}</h5>
+                                <small class="text-muted">إجمالي الرسائل المرسلة</small>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="bg-light p-3 rounded">
+                                <h5 class="text-success">{{ current_user.created_at.strftime('%Y-%m-%d') }}</h5>
+                                <small class="text-muted">تاريخ إنشاء المفتاح</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- أمثلة على الاستخدام -->
+            <div class="card dashboard-card mt-4">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-code-slash"></i>
+                        أمثلة على الاستخدام
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <ul class="nav nav-tabs" id="codeExamples" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="curl-tab" data-bs-toggle="tab" 
+                                    data-bs-target="#curl" type="button" role="tab">cURL</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="php-tab" data-bs-toggle="tab" 
+                                    data-bs-target="#php" type="button" role="tab">PHP</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="python-tab" data-bs-toggle="tab" 
+                                    data-bs-target="#python" type="button" role="tab">Python</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="js-tab" data-bs-toggle="tab" 
+                                    data-bs-target="#javascript" type="button" role="tab">JavaScript</button>
+                        </li>
+                    </ul>
+                    
+                    <div class="tab-content" id="codeExamplesContent">
+                        <!-- cURL Example -->
+                        <div class="tab-pane fade show active" id="curl" role="tabpanel">
+                            <div class="code-block mt-3">
+                                <pre><code># إرسال كود التحقق
+curl -X POST {{ request.url_root }}api/send-verification \
+  -H "Content-Type: application/json" \
+  -H "X-API-Key: {{ current_user.api_key }}" \
+  -d '{
+    "email": "user@example.com"
+  }'</code></pre>
+                            </div>
+                        </div>
+                        
+                        <!-- PHP Example -->
+                        <div class="tab-pane fade" id="php" role="tabpanel">
+                            <div class="code-block mt-3">
+                                <pre><code>&lt;?php
+$url = "{{ request.url_root }}api/send-verification";
+$data = array("email" => "user@example.com");
+
+$options = array(
+    'http' => array(
+        'header'  => "Content-type: application/json\r\n" .
+                     "X-API-Key: {{ current_user.api_key }}\r\n",
+        'method'  => 'POST',
+        'content' => json_encode($data)
+    )
+);
+
+$context  = stream_context_create($options);
+$result = file_get_contents($url, false, $context);
+$response = json_decode($result, true);
+
+if ($response['success']) {
+    echo "تم إرسال الرسالة بنجاح!";
+} else {
+    echo "خطأ: " . $response['error'];
+}
+?&gt;</code></pre>
+                            </div>
+                        </div>
+                        
+                        <!-- Python Example -->
+                        <div class="tab-pane fade" id="python" role="tabpanel">
+                            <div class="code-block mt-3">
+                                <pre><code>import requests
+import json
+
+url = "{{ request.url_root }}api/send-verification"
+headers = {
+    "Content-Type": "application/json",
+    "X-API-Key": "{{ current_user.api_key }}"
+}
+data = {
+    "email": "user@example.com"
+}
+
+response = requests.post(url, headers=headers, json=data)
+result = response.json()
+
+if result['success']:
+    print("تم إرسال الرسالة بنجاح!")
+    print(f"الرصيد المتبقي: {result['remaining_balance']}")
+else:
+    print(f"خطأ: {result['error']}")
+</code></pre>
+                            </div>
+                        </div>
+                        
+                        <!-- JavaScript Example -->
+                        <div class="tab-pane fade" id="javascript" role="tabpanel">
+                            <div class="code-block mt-3">
+                                <pre><code>const apiKey = "{{ current_user.api_key }}";
+const url = "{{ request.url_root }}api/send-verification";
+
+fetch(url, {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json',
+        'X-API-Key': apiKey
+    },
+    body: JSON.stringify({
+        email: 'user@example.com'
+    })
+})
+.then(response => response.json())
+.then(data => {
+    if (data.success) {
+        console.log('تم إرسال الرسالة بنجاح!');
+        console.log('الرصيد المتبقي:', data.remaining_balance);
+    } else {
+        console.error('خطأ:', data.error);
+    }
+})
+.catch(error => {
+    console.error('خطأ في الشبكة:', error);
+});
+</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- معلومات جانبية -->
+        <div class="col-lg-4">
+            <!-- حالة الخدمة -->
+            <div class="card dashboard-card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-activity"></i>
+                        حالة الخدمة
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span>حالة الخادم:</span>
+                        <span class="badge bg-success pulse">
+                            <i class="bi bi-check-circle"></i> نشط
+                        </span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span>الاستجابة:</span>
+                        <span class="text-success fw-bold">< 100ms</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span>آخر تحديث:</span>
+                        <span class="text-muted" id="lastUpdate"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- الخدمات المتاحة -->
+            <div class="card dashboard-card mt-3">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-list-check"></i>
+                        الخدمات المتاحة
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="list-group list-group-flush">
+                        <div class="list-group-item d-flex justify-content-between align-items-center px-0">
+                            <div>
+                                <i class="bi bi-key text-primary me-2"></i>
+                                كود التحقق
+                            </div>
+                            <span class="api-endpoint">POST /api/send-verification</span>
+                        </div>
+                        <div class="list-group-item d-flex justify-content-between align-items-center px-0">
+                            <div>
+                                <i class="bi bi-cart-check text-success me-2"></i>
+                                تفاصيل الطلبات
+                            </div>
+                            <span class="api-endpoint">POST /api/send-order</span>
+                        </div>
+                        <div class="list-group-item d-flex justify-content-between align-items-center px-0">
+                            <div>
+                                <i class="bi bi-heart text-danger me-2"></i>
+                                رسائل ترحيبية
+                            </div>
+                            <span class="api-endpoint">POST /api/send-welcome</span>
+                        </div>
+                        <div class="list-group-item d-flex justify-content-between align-items-center px-0">
+                            <div>
+                                <i class="bi bi-envelope text-info me-2"></i>
+                                رسائل عامة
+                            </div>
+                            <span class="api-endpoint">POST /api/send-custom</span>
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid mt-3">
+                        <a href="{{ url_for('main.documentation') }}" class="btn btn-outline-primary">
+                            <i class="bi bi-book"></i> التوثيق الكامل
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- اختبار سريع -->
+            <div class="card dashboard-card mt-3">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-play-circle"></i>
+                        اختبار سريع
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted small">اختبر API بإرسال رسالة تجريبية</p>
+                    <div class="d-grid gap-2">
+                        <button class="btn btn-primary" data-test-email>
+                            <i class="bi bi-send"></i> إرسال رسالة تجريبية
+                        </button>
+                        <button class="btn btn-outline-info" onclick="checkApiStatus()">
+                            <i class="bi bi-activity"></i> فحص حالة API
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- بيانات خفية للاستخدام في JavaScript -->
+<div data-api-key="{{ current_user.api_key }}" style="display: none;"></div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// إظهار الوقت الحالي
+document.addEventListener('DOMContentLoaded', function() {
+    const now = new Date();
+    const lastUpdate = document.getElementById('lastUpdate');
+    if (lastUpdate) {
+        lastUpdate.textContent = now.toLocaleString('ar-EG', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+    }
+});
+
+// فحص حالة API
+function checkApiStatus() {
+    const button = event.target;
+    setLoading(button, true);
+    
+    fetch('/api/balance', {
+        headers: {
+            'X-API-Key': '{{ current_user.api_key }}'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showMessage('API يعمل بشكل طبيعي!', 'success');
+        } else {
+            showMessage('هناك مشكلة في API', 'error');
+        }
+    })
+    .catch(error => {
+        showMessage('فشل في الاتصال بـ API', 'error');
+    })
+    .finally(() => {
+        setLoading(button, false);
+    });
+}
+
+// نسخ مفتاح API
+document.addEventListener('DOMContentLoaded', function() {
+    const copyButton = document.querySelector('[data-copy-api-key]');
+    if (copyButton) {
+        copyButton.addEventListener('click', function() {
+            const apiKey = this.getAttribute('data-copy-api-key');
+            navigator.clipboard.writeText(apiKey).then(() => {
+                showMessage('تم نسخ مفتاح API بنجاح!', 'success');
+                this.innerHTML = '<i class="bi bi-check"></i> تم النسخ';
+                setTimeout(() => {
+                    this.innerHTML = '<i class="bi bi-clipboard"></i> نسخ';
+                }, 2000);
+            });
+        });
+    }
+    
+    // تأكيد إعادة إنشاء مفتاح API
+    const regenerateButton = document.querySelector('[data-regenerate-api]');
+    if (regenerateButton) {
+        regenerateButton.addEventListener('click', function(e) {
+            e.preventDefault();
+            if (confirm('هل أنت متأكد من إعادة إنشاء مفتاح API؟ سيصبح المفتاح القديم غير صالح.')) {
+                window.location.href = this.href;
+            }
+        });
+    }
+    
+    // اختبار سريع
+    const testButton = document.querySelector('[data-test-email]');
+    if (testButton) {
+        testButton.addEventListener('click', function() {
+            const email = prompt('أدخل البريد الإلكتروني للاختبار:', 'test@example.com');
+            if (email) {
+                testQuickEmail(email);
+            }
+        });
+    }
+});
+
+// اختبار إرسال سريع
+function testQuickEmail(email) {
+    const button = document.querySelector('[data-test-email]');
+    setLoading(button, true);
+    
+    fetch('/api/send-verification', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-API-Key': '{{ current_user.api_key }}'
+        },
+        body: JSON.stringify({
+            email: email
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showMessage(`تم إرسال رسالة تجريبية إلى ${email} بنجاح!`, 'success');
+        } else {
+            showMessage('فشل في الإرسال: ' + data.error, 'error');
+        }
+    })
+    .catch(error => {
+        showMessage('خطأ في الشبكة', 'error');
+    })
+    .finally(() => {
+        setLoading(button, false);
+    });
+}
+</script>
+{% endblock %}

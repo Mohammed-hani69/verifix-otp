@@ -1,0 +1,277 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="dashboard-card">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <h1 class="text-gradient mb-2">
+                            <i class="bi bi-speedometer2"></i>
+                            مرحباً {{ current_user.company_name }}
+                        </h1>
+                        <p class="text-muted mb-0">إدارة وتتبع رسائلك الإلكترونية بسهولة</p>
+                    </div>
+                    <div class="col-md-4 text-end">
+                        <div class="d-flex justify-content-end gap-2">
+                            <button class="btn btn-outline-primary" data-test-email>
+                                <i class="bi bi-send"></i> رسالة تجريبية
+                            </button>
+                            <a href="{{ url_for('auth.email_settings') }}" class="btn btn-outline-secondary">
+                                <i class="bi bi-gear"></i> الإعدادات
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- إحصائيات سريعة -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card stat-card bg-primary text-white">
+                <div class="card-body">
+                    <i class="bi bi-envelope"></i>
+                    <h3 data-stat="total">{{ total_sent }}</h3>
+                    <p class="mb-0">إجمالي الرسائل</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card stat-card bg-success text-white">
+                <div class="card-body">
+                    <i class="bi bi-gift"></i>
+                    <h3 data-stat="free">{{ config.FREE_MESSAGES_LIMIT - free_used }}</h3>
+                    <p class="mb-0">رسائل مجانية متبقية</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card stat-card bg-warning text-white">
+                <div class="card-body">
+                    <i class="bi bi-wallet2"></i>
+                    <h3 data-stat="balance" data-balance>{{ "%.2f"|format(balance) }}</h3>
+                    <p class="mb-0">الرصيد (جنيه)</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card stat-card bg-info text-white">
+                <div class="card-body">
+                    <i class="bi bi-calendar-month"></i>
+                    <h3 data-stat="monthly">{{ monthly_sent }}</h3>
+                    <p class="mb-0">رسائل هذا الشهر</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- تحذير انخفاض الرصيد -->
+    {% if low_balance_warning %}
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                <i class="bi bi-exclamation-triangle"></i>
+                <strong>تحذير:</strong> رصيدك منخفض! قم بشحن حسابك لمتابعة إرسال الرسائل.
+                <a href="{{ url_for('dashboard.balance') }}" class="btn btn-sm btn-warning ms-2">شحن الرصيد</a>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="row">
+        <!-- الرسوم البيانية -->
+        <div class="col-lg-8">
+            <div class="card dashboard-card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-bar-chart"></i>
+                        الرسائل المرسلة خلال الأسبوع الماضي
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="weeklyChart" height="120"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- إعدادات سريعة -->
+        <div class="col-lg-4">
+            <div class="card dashboard-card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-lightning"></i>
+                        إجراءات سريعة
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a href="{{ url_for('dashboard.templates') }}" class="btn btn-outline-primary">
+                            <i class="bi bi-file-earmark-richtext"></i>
+                            إدارة القوالب
+                        </a>
+                        <a href="{{ url_for('dashboard.logs') }}" class="btn btn-outline-info">
+                            <i class="bi bi-clock-history"></i>
+                            سجل الرسائل
+                        </a>
+                        <a href="{{ url_for('dashboard.api_settings') }}" class="btn btn-outline-secondary">
+                            <i class="bi bi-key"></i>
+                            مفتاح API
+                        </a>
+                        <a href="{{ url_for('dashboard.statistics') }}" class="btn btn-outline-success">
+                            <i class="bi bi-graph-up"></i>
+                            الإحصائيات التفصيلية
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- معلومات الحساب -->
+            <div class="card dashboard-card mt-3">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-person-circle"></i>
+                        معلومات الحساب
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-6">
+                            <div class="border-end">
+                                <h4 class="text-primary">{{ current_user.services.count() }}</h4>
+                                <small class="text-muted">خدمات نشطة</small>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <h4 class="text-success">{{ current_user.email_templates.count() }}</h4>
+                            <small class="text-muted">قوالب مخصصة</small>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="text-center">
+                        <small class="text-muted">
+                            عضو منذ: {{ current_user.created_at.strftime('%Y-%m-%d') }}
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- آخر الرسائل المرسلة -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card dashboard-card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="bi bi-clock-history"></i>
+                        آخر الرسائل المرسلة
+                    </h5>
+                    <a href="{{ url_for('dashboard.logs') }}" class="btn btn-sm btn-outline-primary">
+                        عرض الكل
+                    </a>
+                </div>
+                <div class="card-body">
+                    {% if recent_logs %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>المستقبل</th>
+                                    <th>الموضوع</th>
+                                    <th>نوع الخدمة</th>
+                                    <th>الحالة</th>
+                                    <th>التاريخ</th>
+                                    <th>التكلفة</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for log in recent_logs %}
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <i class="bi bi-envelope me-2 text-primary"></i>
+                                            {{ log.recipient_email }}
+                                        </div>
+                                    </td>
+                                    <td>{{ log.subject[:50] }}{% if log.subject|length > 50 %}...{% endif %}</td>
+                                    <td>
+                                        <span class="badge bg-info">{{ log.service_rel.service_name }}</span>
+                                    </td>
+                                    <td>
+                                        {% if log.status == 'sent' %}
+                                            <span class="badge bg-success">
+                                                <i class="bi bi-check-circle"></i> تم الإرسال
+                                            </span>
+                                        {% elif log.status == 'failed' %}
+                                            <span class="badge bg-danger">
+                                                <i class="bi bi-x-circle"></i> فشل
+                                            </span>
+                                        {% else %}
+                                            <span class="badge bg-warning">
+                                                <i class="bi bi-clock"></i> في الانتظار
+                                            </span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <small class="text-muted">
+                                            {{ log.sent_at.strftime('%Y-%m-%d %H:%M') }}
+                                        </small>
+                                    </td>
+                                    <td>
+                                        {% if log.was_free %}
+                                            <span class="badge bg-success">مجانية</span>
+                                        {% else %}
+                                            <span class="text-warning">{{ "%.2f"|format(log.cost) }} ج</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-4">
+                        <i class="bi bi-inbox text-muted" style="font-size: 3rem;"></i>
+                        <h5 class="text-muted mt-3">لم يتم إرسال أي رسائل بعد</h5>
+                        <p class="text-muted">ابدأ بإرسال أول رسالة لك!</p>
+                        <a href="{{ url_for('main.documentation') }}" class="btn btn-primary">
+                            <i class="bi bi-book"></i> اقرأ التوثيق
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- بيانات الرسوم البيانية -->
+<script>
+    // بيانات الرسائل الأسبوعية
+    const weeklyData = [
+        {% for stat in weekly_stats %}
+            {{ stat.count }}{% if not loop.last %},{% endif %}
+        {% endfor %}
+    ];
+    
+    // إعداد مفتاح API للاستخدام في JavaScript
+    {% if current_user.api_key %}
+    document.addEventListener('DOMContentLoaded', function() {
+        const apiKeyElement = document.createElement('div');
+        apiKeyElement.dataset.apiKey = '{{ current_user.api_key }}';
+        apiKeyElement.style.display = 'none';
+        document.body.appendChild(apiKeyElement);
+    });
+    {% endif %}
+</script>
+{% endblock %}
+
+{% block scripts %}
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% endblock %}

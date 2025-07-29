@@ -1,0 +1,232 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="dashboard-card">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <h2 class="text-gradient mb-2">
+                            <i class="bi bi-file-earmark-richtext"></i>
+                            إدارة القوالب
+                        </h2>
+                        <p class="text-muted mb-0">صمم وخصص قوالب رسائلك الإلكترونية</p>
+                    </div>
+                    <div class="col-md-4 text-end">
+                        <a href="{{ url_for('dashboard.create_edit_template') }}" class="btn btn-primary">
+                            <i class="bi bi-plus-circle"></i> إنشاء قالب جديد
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if templates %}
+    <!-- قائمة القوالب -->
+    <div class="row">
+        {% for template in templates %}
+        <div class="col-lg-6 col-xl-4 mb-4">
+            <div class="card dashboard-card h-100">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h6 class="mb-0 fw-bold">{{ template.template_name }}</h6>
+                    <span class="badge" style="background-color: {{ template.primary_color }};">
+                        {{ template.service.service_name }}
+                    </span>
+                </div>
+                <div class="card-body">
+                    <!-- معاينة القالب -->
+                    <div class="template-preview mb-3" style="max-height: 200px; overflow: hidden;">
+                        <div style="background: linear-gradient(135deg, {{ template.primary_color }} 0%, {{ template.secondary_color }} 100%); 
+                                    color: white; padding: 15px; border-radius: 5px 5px 0 0; font-size: 12px;">
+                            {% if template.logo_url %}
+                            <img src="{{ template.logo_url }}" alt="Logo" style="max-height: 30px; margin-bottom: 5px;">
+                            {% endif %}
+                            <div class="fw-bold">{{ current_user.company_name }}</div>
+                        </div>
+                        <div style="padding: 15px; background: white; border-radius: 0 0 5px 5px; font-size: 12px;">
+                            <div class="fw-bold mb-2">{{ template.subject }}</div>
+                            <div class="text-muted">
+                                {{ template.html_content|striptags|truncate(100) }}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- معلومات القالب -->
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <small class="text-muted">
+                            <i class="bi bi-calendar"></i>
+                            {{ template.updated_at.strftime('%Y-%m-%d') }}
+                        </small>
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="badge bg-light text-dark" style="border: 2px solid {{ template.primary_color }};">
+                                {{ template.primary_color }}
+                            </span>
+                            <span class="badge bg-light text-dark" style="border: 2px solid {{ template.secondary_color }};">
+                                {{ template.secondary_color }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer bg-transparent">
+                    <div class="d-flex justify-content-between">
+                        <div class="btn-group" role="group">
+                            <a href="{{ url_for('dashboard.create_edit_template', template_id=template.id) }}" 
+                               class="btn btn-sm btn-outline-primary">
+                                <i class="bi bi-pencil"></i> تعديل
+                            </a>
+                            <button class="btn btn-sm btn-outline-success" 
+                                    onclick="previewTemplate({{ template.id }})">
+                                <i class="bi bi-eye"></i> معاينة
+                            </button>
+                        </div>
+                        <form method="POST" action="{{ url_for('dashboard.delete_template', template_id=template.id) }}" 
+                              style="display: inline;">
+                            <button type="submit" class="btn btn-sm btn-outline-danger" 
+                                    data-delete>
+                                <i class="bi bi-trash"></i> حذف
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- إحصائيات القوالب -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card dashboard-card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-bar-chart"></i>
+                        إحصائيات استخدام القوالب
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        {% for template in templates %}
+                        <div class="col-md-3 text-center mb-3">
+                            <div class="p-3 rounded" style="background: linear-gradient(135deg, {{ template.primary_color }}22 0%, {{ template.secondary_color }}22 100%);">
+                                <h4 style="color: {{ template.primary_color }};">
+                                    {{ template.logs|length }}
+                                </h4>
+                                <small class="text-muted">{{ template.template_name }}</small>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% else %}
+    <!-- حالة عدم وجود قوالب -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card dashboard-card text-center py-5">
+                <div class="card-body">
+                    <i class="bi bi-file-earmark-plus text-muted" style="font-size: 4rem;"></i>
+                    <h4 class="text-muted mt-3">لا توجد قوالب بعد</h4>
+                    <p class="text-muted mb-4">ابدأ بإنشاء قالبك الأول لتخصيص رسائلك</p>
+                    <a href="{{ url_for('dashboard.create_edit_template') }}" class="btn btn-primary btn-lg">
+                        <i class="bi bi-plus-circle"></i> إنشاء أول قالب
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- نصائح وإرشادات -->
+    <div class="row mt-4">
+        <div class="col-md-4">
+            <div class="card dashboard-card">
+                <div class="card-body text-center">
+                    <i class="bi bi-lightbulb text-warning" style="font-size: 2.5rem;"></i>
+                    <h6 class="mt-3">نصائح للتصميم</h6>
+                    <p class="small text-muted">
+                        استخدم ألوان متناسقة واحرص على وضوح النص وسهولة القراءة
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card dashboard-card">
+                <div class="card-body text-center">
+                    <i class="bi bi-code-square text-info" style="font-size: 2.5rem;"></i>
+                    <h6 class="mt-3">المتغيرات المتاحة</h6>
+                    <p class="small text-muted">
+                        يمكنك استخدام متغيرات مثل {{company_name}} و {{customer_name}}
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card dashboard-card">
+                <div class="card-body text-center">
+                    <i class="bi bi-device-mobile text-success" style="font-size: 2.5rem;"></i>
+                    <h6 class="mt-3">التجاوب مع الأجهزة</h6>
+                    <p class="small text-muted">
+                        تأكد من أن قالبك يبدو جيداً على جميع أحجام الشاشات
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal لمعاينة القالب -->
+<div class="modal fade" id="templatePreviewModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">معاينة القالب</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="templatePreviewContent">
+                <!-- سيتم تحميل المحتوى هنا -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إغلاق</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// معاينة القالب
+function previewTemplate(templateId) {
+    // البحث عن القالب في الصفحة
+    const templateCard = document.querySelector(`[onclick="previewTemplate(${templateId})"]`).closest('.card');
+    const templateContent = templateCard.querySelector('.template-preview').innerHTML;
+    
+    // عرض المعاينة في modal
+    document.getElementById('templatePreviewContent').innerHTML = templateContent;
+    
+    const modal = new bootstrap.Modal(document.getElementById('templatePreviewModal'));
+    modal.show();
+}
+
+// تحسين عرض القوالب
+document.addEventListener('DOMContentLoaded', function() {
+    // إضافة تأثيرات hover على البطاقات
+    const templateCards = document.querySelectorAll('.card.dashboard-card');
+    templateCards.forEach(card => {
+        card.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-5px)';
+        });
+        
+        card.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+        });
+    });
+});
+</script>
+{% endblock %}

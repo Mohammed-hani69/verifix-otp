@@ -1,0 +1,864 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="hero-section text-center text-white py-5 mb-0">
+    <div class="container">
+        <h1 class="display-4 fw-bold mb-4">
+            <i class="bi bi-book"></i>
+            توثيق API
+        </h1>
+        <p class="lead">
+            دليل شامل لاستخدام خدمة إرسال الرسائل الإلكترونية
+        </p>
+    </div>
+</div>
+
+<div class="container my-5">
+    <div class="row">
+        <!-- فهرس المحتويات -->
+        <div class="col-lg-3">
+            <div class="card position-sticky" style="top: 20px;">
+                <div class="card-header">
+                    <h6 class="mb-0">
+                        <i class="bi bi-list"></i>
+                        فهرس المحتويات
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <nav class="nav flex-column">
+                        <a class="nav-link" href="#getting-started">البداية السريعة</a>
+                        <a class="nav-link" href="#authentication">المصادقة</a>
+                        <a class="nav-link" href="#services">الخدمات المتاحة</a>
+                        <a class="nav-link" href="#verification">كود التحقق</a>
+                        <a class="nav-link" href="#orders">تفاصيل الطلبات</a>
+                        <a class="nav-link" href="#welcome">رسائل الترحيب</a>
+                        <a class="nav-link" href="#custom">رسائل مخصصة</a>
+                        <a class="nav-link" href="#templates">القوالب المخصصة</a>
+                        <a class="nav-link" href="#errors">أكواد الأخطاء</a>
+                        <a class="nav-link" href="#examples">أمثلة كاملة</a>
+                        <a class="nav-link" href="#sdk">مكتبات SDK</a>
+                    </nav>
+                </div>
+            </div>
+        </div>
+
+        <!-- المحتوى الرئيسي -->
+        <div class="col-lg-9">
+            <!-- البداية السريعة -->
+            <section id="getting-started" class="mb-5">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="mb-0">
+                            <i class="bi bi-rocket"></i>
+                            البداية السريعة
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <p>مرحباً بك في خدمة Email Sender Pro! اتبع هذه الخطوات للبدء:</p>
+                        
+                        <h5>الخطوة 1: إنشاء حساب</h5>
+                        <p>قم بإنشاء حساب جديد للحصول على مفتاح API الخاص بك.</p>
+                        
+                        <h5>الخطوة 2: إعداد البريد الإلكتروني</h5>
+                        <p>قم بإعداد إعدادات SMTP الخاصة بك في لوحة التحكم.</p>
+                        
+                        <h5>الخطوة 3: إرسال أول رسالة</h5>
+                        <div class="code-block">
+                            <pre><code>curl -X POST {{ request.url_root }}api/send-verification \
+  -H "Content-Type: application/json" \
+  -H "X-API-Key: YOUR_API_KEY" \
+  -d '{"email": "user@example.com"}'</code></pre>
+                        </div>
+                        
+                        <div class="alert alert-info mt-3">
+                            <i class="bi bi-gift"></i>
+                            <strong>مكافأة:</strong> تحصل على 1000 رسالة مجانية عند التسجيل!
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- المصادقة -->
+            <section id="authentication" class="mb-5">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="mb-0">
+                            <i class="bi bi-shield-check"></i>
+                            المصادقة
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <p>جميع طلبات API تتطلب مفتاح API للمصادقة. يمكنك العثور على مفتاحك في لوحة التحكم.</p>
+                        
+                        <h5>طرق إرسال مفتاح API:</h5>
+                        
+                        <h6>1. في رأس HTTP (موصى به):</h6>
+                        <div class="code-block">
+                            <pre><code>X-API-Key: your-api-key-here</code></pre>
+                        </div>
+                        
+                        <h6>2. في محتوى JSON:</h6>
+                        <div class="code-block">
+                            <pre><code>{
+  "api_key": "your-api-key-here",
+  "email": "user@example.com"
+}</code></pre>
+                        </div>
+                        
+                        <div class="alert alert-warning">
+                            <i class="bi bi-exclamation-triangle"></i>
+                            <strong>أمان:</strong> احتفظ بمفتاح API في مكان آمن ولا تشاركه مع أي شخص آخر.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- الخدمات المتاحة -->
+            <section id="services" class="mb-5">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="mb-0">
+                            <i class="bi bi-grid"></i>
+                            الخدمات المتاحة
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <div class="border rounded p-3">
+                                    <h5 class="text-primary">
+                                        <i class="bi bi-key"></i>
+                                        كود التحقق
+                                    </h5>
+                                    <p class="small text-muted">إرسال أكواد التحقق الآمنة</p>
+                                    <span class="api-endpoint">POST /api/send-verification</span>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <div class="border rounded p-3">
+                                    <h5 class="text-success">
+                                        <i class="bi bi-cart-check"></i>
+                                        تفاصيل الطلبات
+                                    </h5>
+                                    <p class="small text-muted">إرسال فواتير وتفاصيل الطلبات</p>
+                                    <span class="api-endpoint">POST /api/send-order</span>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <div class="border rounded p-3">
+                                    <h5 class="text-danger">
+                                        <i class="bi bi-heart"></i>
+                                        رسائل ترحيبية
+                                    </h5>
+                                    <p class="small text-muted">رحب بعملائك الجدد</p>
+                                    <span class="api-endpoint">POST /api/send-welcome</span>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <div class="border rounded p-3">
+                                    <h5 class="text-info">
+                                        <i class="bi bi-envelope"></i>
+                                        رسائل مخصصة
+                                    </h5>
+                                    <p class="small text-muted">إرسال أي نوع من الرسائل</p>
+                                    <span class="api-endpoint">POST /api/send-custom</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- خدمة كود التحقق -->
+            <section id="verification" class="mb-5">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="mb-0">
+                            <i class="bi bi-key"></i>
+                            إرسال كود التحقق
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <p>إرسال كود تحقق آمن للمستخدمين لتأكيد هويتهم.</p>
+                        
+                        <h5>الطلب:</h5>
+                        <div class="code-block">
+                            <pre><code>POST {{ request.url_root }}api/send-verification
+Content-Type: application/json
+X-API-Key: YOUR_API_KEY
+
+{
+  "email": "user@example.com"
+}</code></pre>
+                        </div>
+                        
+                        <h5>الاستجابة الناجحة:</h5>
+                        <div class="code-block">
+                            <pre><code>{
+  "success": true,
+  "message": "تم إرسال كود التحقق بنجاح",
+  "verification_code": "123456",
+  "remaining_balance": 45.75,
+  "free_messages_remaining": 850
+}</code></pre>
+                        </div>
+                        
+                        <h5>البيانات المطلوبة:</h5>
+                        <div class="table-responsive">
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>الحقل</th>
+                                        <th>النوع</th>
+                                        <th>مطلوب</th>
+                                        <th>الوصف</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><code>email</code></td>
+                                        <td>string</td>
+                                        <td>نعم</td>
+                                        <td>البريد الإلكتروني للمستقبل</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- خدمة تفاصيل الطلبات -->
+            <section id="orders" class="mb-5">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="mb-0">
+                            <i class="bi bi-cart-check"></i>
+                            إرسال تفاصيل الطلبات
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <p>إرسال فواتير وتفاصيل الطلبات للعملاء.</p>
+                        
+                        <h5>الطلب:</h5>
+                        <div class="code-block">
+                            <pre><code>POST {{ request.url_root }}api/send-order
+Content-Type: application/json
+X-API-Key: YOUR_API_KEY
+
+{
+  "email": "customer@example.com",
+  "order_number": "ORD-12345",
+  "customer_name": "أحمد محمد",
+  "total_amount": "250.00",
+  "order_date": "2025-01-15",
+  "order_status": "تم التأكيد"
+}</code></pre>
+                        </div>
+                        
+                        <h5>البيانات المطلوبة:</h5>
+                        <div class="table-responsive">
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>الحقل</th>
+                                        <th>النوع</th>
+                                        <th>مطلوب</th>
+                                        <th>الوصف</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><code>email</code></td>
+                                        <td>string</td>
+                                        <td>نعم</td>
+                                        <td>البريد الإلكتروني للعميل</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>order_number</code></td>
+                                        <td>string</td>
+                                        <td>نعم</td>
+                                        <td>رقم الطلب</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>customer_name</code></td>
+                                        <td>string</td>
+                                        <td>نعم</td>
+                                        <td>اسم العميل</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>total_amount</code></td>
+                                        <td>string</td>
+                                        <td>نعم</td>
+                                        <td>المبلغ الإجمالي</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>order_date</code></td>
+                                        <td>string</td>
+                                        <td>لا</td>
+                                        <td>تاريخ الطلب (افتراضي: اليوم)</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>order_status</code></td>
+                                        <td>string</td>
+                                        <td>لا</td>
+                                        <td>حالة الطلب (افتراضي: تم الاستلام)</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- خدمة الرسائل الترحيبية -->
+            <section id="welcome" class="mb-5">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="mb-0">
+                            <i class="bi bi-heart"></i>
+                            إرسال رسائل ترحيبية
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <p>رحب بعملائك الجدد برسالة ترحيبية جميلة.</p>
+                        
+                        <h5>الطلب:</h5>
+                        <div class="code-block">
+                            <pre><code>POST {{ request.url_root }}api/send-welcome
+Content-Type: application/json
+X-API-Key: YOUR_API_KEY
+
+{
+  "email": "newcustomer@example.com",
+  "customer_name": "سارة أحمد"
+}</code></pre>
+                        </div>
+                        
+                        <h5>البيانات المطلوبة:</h5>
+                        <div class="table-responsive">
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>الحقل</th>
+                                        <th>النوع</th>
+                                        <th>مطلوب</th>
+                                        <th>الوصف</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><code>email</code></td>
+                                        <td>string</td>
+                                        <td>نعم</td>
+                                        <td>البريد الإلكتروني للعميل الجديد</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>customer_name</code></td>
+                                        <td>string</td>
+                                        <td>نعم</td>
+                                        <td>اسم العميل</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- خدمة الرسائل المخصصة -->
+            <section id="custom" class="mb-5">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="mb-0">
+                            <i class="bi bi-envelope"></i>
+                            إرسال رسائل مخصصة
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <p>إرسال رسائل مخصصة بمحتوى من اختيارك.</p>
+                        
+                        <h5>الطلب:</h5>
+                        <div class="code-block">
+                            <pre><code>POST {{ request.url_root }}api/send-custom
+Content-Type: application/json
+X-API-Key: YOUR_API_KEY
+
+{
+  "email": "recipient@example.com",
+  "subject": "إشعار مهم",
+  "message_title": "تحديث الخدمة",
+  "message_content": "نود إعلامكم بتحديث خدماتنا..."
+}</code></pre>
+                        </div>
+                        
+                        <h5>البيانات المطلوبة:</h5>
+                        <div class="table-responsive">
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>الحقل</th>
+                                        <th>النوع</th>
+                                        <th>مطلوب</th>
+                                        <th>الوصف</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><code>email</code></td>
+                                        <td>string</td>
+                                        <td>نعم</td>
+                                        <td>البريد الإلكتروني للمستقبل</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>subject</code></td>
+                                        <td>string</td>
+                                        <td>نعم</td>
+                                        <td>موضوع الرسالة</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>message_content</code></td>
+                                        <td>string</td>
+                                        <td>نعم</td>
+                                        <td>محتوى الرسالة</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>message_title</code></td>
+                                        <td>string</td>
+                                        <td>لا</td>
+                                        <td>عنوان الرسالة (افتراضي: نفس الموضوع)</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- أكواد الأخطاء -->
+            <section id="errors" class="mb-5">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="mb-0">
+                            <i class="bi bi-exclamation-triangle"></i>
+                            أكواد الأخطاء
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>كود HTTP</th>
+                                        <th>كود الخطأ</th>
+                                        <th>الوصف</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>401</td>
+                                        <td>API_KEY_REQUIRED</td>
+                                        <td>مفتاح API مطلوب</td>
+                                    </tr>
+                                    <tr>
+                                        <td>401</td>
+                                        <td>INVALID_API_KEY</td>
+                                        <td>مفتاح API غير صحيح</td>
+                                    </tr>
+                                    <tr>
+                                        <td>403</td>
+                                        <td>ACCOUNT_INACTIVE</td>
+                                        <td>الحساب غير نشط</td>
+                                    </tr>
+                                    <tr>
+                                        <td>403</td>
+                                        <td>INSUFFICIENT_BALANCE</td>
+                                        <td>رصيد غير كافي</td>
+                                    </tr>
+                                    <tr>
+                                        <td>400</td>
+                                        <td>EMAIL_REQUIRED</td>
+                                        <td>البريد الإلكتروني مطلوب</td>
+                                    </tr>
+                                    <tr>
+                                        <td>400</td>
+                                        <td>FIELD_REQUIRED</td>
+                                        <td>حقل مطلوب مفقود</td>
+                                    </tr>
+                                    <tr>
+                                        <td>400</td>
+                                        <td>EMAIL_SETTINGS_INCOMPLETE</td>
+                                        <td>إعدادات البريد غير مكتملة</td>
+                                    </tr>
+                                    <tr>
+                                        <td>500</td>
+                                        <td>SEND_FAILED</td>
+                                        <td>فشل في إرسال البريد</td>
+                                    </tr>
+                                    <tr>
+                                        <td>500</td>
+                                        <td>SERVER_ERROR</td>
+                                        <td>خطأ في الخادم</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- أمثلة كاملة -->
+            <section id="examples" class="mb-5">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="mb-0">
+                            <i class="bi bi-code-square"></i>
+                            أمثلة كاملة
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <ul class="nav nav-tabs" id="exampleTabs" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active" id="php-complete-tab" data-bs-toggle="tab" 
+                                        data-bs-target="#php-complete" type="button" role="tab">PHP</button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="python-complete-tab" data-bs-toggle="tab" 
+                                        data-bs-target="#python-complete" type="button" role="tab">Python</button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="js-complete-tab" data-bs-toggle="tab" 
+                                        data-bs-target="#js-complete" type="button" role="tab">JavaScript</button>
+                            </li>
+                        </ul>
+                        
+                        <div class="tab-content" id="exampleTabsContent">
+                            <!-- PHP Example -->
+                            <div class="tab-pane fade show active" id="php-complete" role="tabpanel">
+                                <div class="code-block mt-3">
+                                    <pre><code>&lt;?php
+class EmailSenderAPI {
+    private $apiKey;
+    private $baseUrl = "{{ request.url_root }}api/";
+    
+    public function __construct($apiKey) {
+        $this->apiKey = $apiKey;
+    }
+    
+    private function sendRequest($endpoint, $data) {
+        $url = $this->baseUrl . $endpoint;
+        $options = array(
+            'http' => array(
+                'header'  => "Content-type: application/json\r\n" .
+                             "X-API-Key: " . $this->apiKey . "\r\n",
+                'method'  => 'POST',
+                'content' => json_encode($data)
+            )
+        );
+        
+        $context = stream_context_create($options);
+        $result = file_get_contents($url, false, $context);
+        return json_decode($result, true);
+    }
+    
+    public function sendVerification($email) {
+        return $this->sendRequest('send-verification', ['email' => $email]);
+    }
+    
+    public function sendOrder($email, $orderNumber, $customerName, $totalAmount) {
+        return $this->sendRequest('send-order', [
+            'email' => $email,
+            'order_number' => $orderNumber,
+            'customer_name' => $customerName,
+            'total_amount' => $totalAmount
+        ]);
+    }
+    
+    public function sendWelcome($email, $customerName) {
+        return $this->sendRequest('send-welcome', [
+            'email' => $email,
+            'customer_name' => $customerName
+        ]);
+    }
+}
+
+// الاستخدام
+$api = new EmailSenderAPI('your-api-key-here');
+
+// إرسال كود تحقق
+$result = $api->sendVerification('user@example.com');
+if ($result['success']) {
+    echo "تم إرسال كود التحقق: " . $result['verification_code'];
+} else {
+    echo "خطأ: " . $result['error'];
+}
+?&gt;</code></pre>
+                                </div>
+                            </div>
+                            
+                            <!-- Python Example -->
+                            <div class="tab-pane fade" id="python-complete" role="tabpanel">
+                                <div class="code-block mt-3">
+                                    <pre><code>import requests
+import json
+
+class EmailSenderAPI:
+    def __init__(self, api_key):
+        self.api_key = api_key
+        self.base_url = "{{ request.url_root }}api/"
+        self.headers = {
+            "Content-Type": "application/json",
+            "X-API-Key": self.api_key
+        }
+    
+    def _send_request(self, endpoint, data):
+        url = self.base_url + endpoint
+        response = requests.post(url, headers=self.headers, json=data)
+        return response.json()
+    
+    def send_verification(self, email):
+        return self._send_request('send-verification', {'email': email})
+    
+    def send_order(self, email, order_number, customer_name, total_amount):
+        data = {
+            'email': email,
+            'order_number': order_number,
+            'customer_name': customer_name,
+            'total_amount': total_amount
+        }
+        return self._send_request('send-order', data)
+    
+    def send_welcome(self, email, customer_name):
+        data = {
+            'email': email,
+            'customer_name': customer_name
+        }
+        return self._send_request('send-welcome', data)
+    
+    def get_balance(self):
+        url = self.base_url + "balance"
+        response = requests.get(url, headers=self.headers)
+        return response.json()
+
+# الاستخدام
+api = EmailSenderAPI('your-api-key-here')
+
+# إرسال كود تحقق
+result = api.send_verification('user@example.com')
+if result['success']:
+    print(f"تم إرسال كود التحقق: {result['verification_code']}")
+    print(f"الرصيد المتبقي: {result['remaining_balance']}")
+else:
+    print(f"خطأ: {result['error']}")
+
+# التحقق من الرصيد
+balance = api.get_balance()
+print(f"الرصيد الحالي: {balance['balance']}")
+</code></pre>
+                                </div>
+                            </div>
+                            
+                            <!-- JavaScript Example -->
+                            <div class="tab-pane fade" id="js-complete" role="tabpanel">
+                                <div class="code-block mt-3">
+                                    <pre><code>class EmailSenderAPI {
+    constructor(apiKey) {
+        this.apiKey = apiKey;
+        this.baseUrl = "{{ request.url_root }}api/";
+        this.headers = {
+            'Content-Type': 'application/json',
+            'X-API-Key': this.apiKey
+        };
+    }
+    
+    async sendRequest(endpoint, data) {
+        const url = this.baseUrl + endpoint;
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: this.headers,
+            body: JSON.stringify(data)
+        });
+        return await response.json();
+    }
+    
+    async sendVerification(email) {
+        return await this.sendRequest('send-verification', { email });
+    }
+    
+    async sendOrder(email, orderNumber, customerName, totalAmount) {
+        const data = {
+            email,
+            order_number: orderNumber,
+            customer_name: customerName,
+            total_amount: totalAmount
+        };
+        return await this.sendRequest('send-order', data);
+    }
+    
+    async sendWelcome(email, customerName) {
+        const data = {
+            email,
+            customer_name: customerName
+        };
+        return await this.sendRequest('send-welcome', data);
+    }
+    
+    async getBalance() {
+        const url = this.baseUrl + "balance";
+        const response = await fetch(url, { headers: this.headers });
+        return await response.json();
+    }
+}
+
+// الاستخدام
+const api = new EmailSenderAPI('your-api-key-here');
+
+// إرسال كود تحقق
+api.sendVerification('user@example.com')
+    .then(result => {
+        if (result.success) {
+            console.log('تم إرسال كود التحقق:', result.verification_code);
+            console.log('الرصيد المتبقي:', result.remaining_balance);
+        } else {
+            console.error('خطأ:', result.error);
+        }
+    })
+    .catch(error => {
+        console.error('خطأ في الشبكة:', error);
+    });
+
+// التحقق من الرصيد
+api.getBalance().then(balance => {
+    console.log('الرصيد الحالي:', balance.balance);
+});
+</code></pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- مكتبات SDK -->
+            <section id="sdk" class="mb-5">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="mb-0">
+                            <i class="bi bi-download"></i>
+                            مكتبات SDK
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <p>نوفر مكتبات رسمية لتسهيل التكامل مع خدمتنا:</p>
+                        
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <div class="card text-center">
+                                    <div class="card-body">
+                                        <i class="bi bi-filetype-php text-primary" style="font-size: 3rem;"></i>
+                                        <h5 class="mt-3">PHP SDK</h5>
+                                        <p class="small text-muted">مكتبة PHP رسمية</p>
+                                        <button class="btn btn-primary btn-sm" disabled>
+                                            قريباً
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <div class="card text-center">
+                                    <div class="card-body">
+                                        <i class="bi bi-filetype-py text-success" style="font-size: 3rem;"></i>
+                                        <h5 class="mt-3">Python SDK</h5>
+                                        <p class="small text-muted">مكتبة Python رسمية</p>
+                                        <button class="btn btn-success btn-sm" disabled>
+                                            قريباً
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <div class="card text-center">
+                                    <div class="card-body">
+                                        <i class="bi bi-filetype-js text-warning" style="font-size: 3rem;"></i>
+                                        <h5 class="mt-3">Node.js SDK</h5>
+                                        <p class="small text-muted">مكتبة Node.js رسمية</p>
+                                        <button class="btn btn-warning btn-sm" disabled>
+                                            قريباً
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="alert alert-info">
+                            <i class="bi bi-info-circle"></i>
+                            <strong>قريباً:</strong> سنطلق مكتبات SDK رسمية لتسهيل التكامل مع خدمتنا.
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// تمرير سلس بين الأقسام
+document.addEventListener('DOMContentLoaded', function() {
+    // تحديث الروابط النشطة في فهرس المحتويات
+    const navLinks = document.querySelectorAll('.nav-link[href^="#"]');
+    const sections = document.querySelectorAll('section[id]');
+    
+    window.addEventListener('scroll', function() {
+        let current = '';
+        sections.forEach(section => {
+            const sectionTop = section.offsetTop;
+            const sectionHeight = section.clientHeight;
+            if (window.pageYOffset >= sectionTop - 200) {
+                current = section.getAttribute('id');
+            }
+        });
+        
+        navLinks.forEach(link => {
+            link.classList.remove('active');
+            if (link.getAttribute('href') === '#' + current) {
+                link.classList.add('active');
+            }
+        });
+    });
+    
+    // تمرير سلس عند النقر على الروابط
+    navLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            const targetId = this.getAttribute('href').substring(1);
+            const targetSection = document.getElementById(targetId);
+            
+            if (targetSection) {
+                targetSection.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        });
+    });
+});
+
+// نسخ الكود عند النقر على أمثلة الكود
+document.querySelectorAll('.code-block pre code').forEach(block => {
+    block.addEventListener('click', function() {
+        const text = this.textContent;
+        navigator.clipboard.writeText(text).then(() => {
+            showMessage('تم نسخ الكود!', 'success');
+        }).catch(() => {
+            showMessage('فشل في نسخ الكود', 'error');
+        });
+    });
+    
+    // إضافة مؤشر يدل على إمكانية النسخ
+    block.style.cursor = 'pointer';
+    block.title = 'انقر لنسخ الكود';
+});
+</script>
+{% endblock %}

@@ -1,0 +1,521 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="dashboard-card">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <h2 class="text-gradient mb-2">
+                            <i class="bi bi-plus-circle"></i>
+                            {% if template %}تعديل قالب{% else %}إنشاء قالب جديد{% endif %}
+                        </h2>
+                        <p class="text-muted mb-0">
+                            {% if template %}
+                                تعديل قالب "{{ template.template_name }}"
+                            {% else %}
+                                صمم قالب رسائل إلكترونية مخصص لشركتك
+                            {% endif %}
+                        </p>
+                    </div>
+                    <div class="col-md-4 text-end">
+                        <a href="{{ url_for('dashboard.templates') }}" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-right"></i> العودة للقوالب
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <form method="POST" enctype="multipart/form-data">
+        {{ form.hidden_tag() }}
+        
+        <div class="row">
+            <!-- نموذج التصميم -->
+            <div class="col-lg-6">
+                <div class="card dashboard-card">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="bi bi-gear"></i>
+                            إعدادات القالب
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <!-- معلومات أساسية -->
+                        <div class="row mb-3">
+                            <div class="col-md-8">
+                                {{ form.template_name.label(class="form-label fw-bold") }}
+                                {{ form.template_name(class="form-control") }}
+                                {% if form.template_name.errors %}
+                                    <div class="text-danger small">{{ form.template_name.errors[0] }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-4">
+                                {{ form.service_id.label(class="form-label fw-bold") }}
+                                {{ form.service_id(class="form-select") }}
+                                {% if form.service_id.errors %}
+                                    <div class="text-danger small">{{ form.service_id.errors[0] }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- موضوع الرسالة -->
+                        <div class="mb-3">
+                            {{ form.subject.label(class="form-label fw-bold") }}
+                            {{ form.subject(class="form-control") }}
+                            {% if form.subject.errors %}
+                                <div class="text-danger small">{{ form.subject.errors[0] }}</div>
+                            {% endif %}
+                            <div class="form-text">يمكنك استخدام متغيرات مثل {{company_name}}</div>
+                        </div>
+
+                        <!-- إعدادات الألوان -->
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                {{ form.primary_color.label(class="form-label fw-bold") }}
+                                <div class="d-flex align-items-center gap-2">
+                                    {{ form.primary_color(class="color-picker") }}
+                                    <span class="text-muted" id="primary-color-value">{{ form.primary_color.data or '#007bff' }}</span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                {{ form.secondary_color.label(class="form-label fw-bold") }}
+                                <div class="d-flex align-items-center gap-2">
+                                    {{ form.secondary_color(class="color-picker") }}
+                                    <span class="text-muted" id="secondary-color-value">{{ form.secondary_color.data or '#6c757d' }}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- رفع الشعار -->
+                        <div class="mb-3">
+                            {{ form.logo.label(class="form-label fw-bold") }}
+                            {{ form.logo(class="form-control") }}
+                            {% if form.logo.errors %}
+                                <div class="text-danger small">{{ form.logo.errors[0] }}</div>
+                            {% endif %}
+                            {% if template and template.logo_url %}
+                                <div class="mt-2">
+                                    <img src="{{ template.logo_url }}" alt="الشعار الحالي" class="img-thumbnail" style="max-height: 60px;">
+                                    <small class="text-muted d-block">الشعار الحالي</small>
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- محتوى القالب -->
+                        <div class="mb-3">
+                            {{ form.html_content.label(class="form-label fw-bold") }}
+                            {{ form.html_content(class="form-control", rows="15", id="html_content") }}
+                            {% if form.html_content.errors %}
+                                <div class="text-danger small">{{ form.html_content.errors[0] }}</div>
+                            {% endif %}
+                        </div>
+
+                        <!-- أزرار الإجراءات -->
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <button type="button" class="btn btn-outline-info" onclick="insertVariable()">
+                                    <i class="bi bi-plus"></i> إدراج متغير
+                                </button>
+                                <button type="button" class="btn btn-outline-success" onclick="previewTemplate()">
+                                    <i class="bi bi-eye"></i> معاينة
+                                </button>
+                            </div>
+                            <div>
+                                {{ form.submit(class="btn btn-primary") }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- معاينة مباشرة -->
+            <div class="col-lg-6">
+                <div class="card dashboard-card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">
+                            <i class="bi bi-eye"></i>
+                            معاينة مباشرة
+                        </h5>
+                        <div class="btn-group" role="group">
+                            <button type="button" class="btn btn-sm btn-outline-primary active" onclick="setPreviewMode('desktop')">
+                                <i class="bi bi-laptop"></i>
+                            </button>
+                            <button type="button" class="btn btn-sm btn-outline-primary" onclick="setPreviewMode('mobile')">
+                                <i class="bi bi-phone"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div id="live-preview" class="border rounded p-3" style="min-height: 400px; background: #f8f9fa;">
+                            <div class="text-center text-muted">
+                                <i class="bi bi-eye-slash" style="font-size: 2rem;"></i>
+                                <p class="mt-2">المعاينة ستظهر هنا</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- المتغيرات المتاحة -->
+                <div class="card dashboard-card mt-3">
+                    <div class="card-header">
+                        <h6 class="mb-0">
+                            <i class="bi bi-code-square"></i>
+                            المتغيرات المتاحة
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row small">
+                            <div class="col-6">
+                                <div class="mb-2">
+                                    <code>{{company_name}}</code>
+                                    <br><small class="text-muted">اسم الشركة</small>
+                                </div>
+                                <div class="mb-2">
+                                    <code>{{current_year}}</code>
+                                    <br><small class="text-muted">السنة الحالية</small>
+                                </div>
+                                <div class="mb-2">
+                                    <code>{{logo}}</code>
+                                    <br><small class="text-muted">شعار الشركة</small>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="mb-2">
+                                    <code>{{verification_code}}</code>
+                                    <br><small class="text-muted">كود التحقق</small>
+                                </div>
+                                <div class="mb-2">
+                                    <code>{{customer_name}}</code>
+                                    <br><small class="text-muted">اسم العميل</small>
+                                </div>
+                                <div class="mb-2">
+                                    <code>{{order_number}}</code>
+                                    <br><small class="text-muted">رقم الطلب</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- قوالب جاهزة -->
+                <div class="card dashboard-card mt-3">
+                    <div class="card-header">
+                        <h6 class="mb-0">
+                            <i class="bi bi-collection"></i>
+                            قوالب جاهزة
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-grid gap-2">
+                            <button type="button" class="btn btn-sm btn-outline-primary" 
+                                    onclick="loadTemplate('verification')">
+                                قالب كود التحقق
+                            </button>
+                            <button type="button" class="btn btn-sm btn-outline-success" 
+                                    onclick="loadTemplate('order')">
+                                قالب تفاصيل الطلب
+                            </button>
+                            <button type="button" class="btn btn-sm btn-outline-info" 
+                                    onclick="loadTemplate('welcome')">
+                                قالب الترحيب
+                            </button>
+                            <button type="button" class="btn btn-sm btn-outline-secondary" 
+                                    onclick="loadTemplate('general')">
+                                قالب عام
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<!-- Modal لإدراج المتغيرات -->
+<div class="modal fade" id="variableModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">إدراج متغير</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="list-group">
+                    <button type="button" class="list-group-item list-group-item-action" 
+                            onclick="insertVariableIntoEditor('{{company_name}}')">
+                        <strong>{{company_name}}</strong> - اسم الشركة
+                    </button>
+                    <button type="button" class="list-group-item list-group-item-action" 
+                            onclick="insertVariableIntoEditor('{{customer_name}}')">
+                        <strong>{{customer_name}}</strong> - اسم العميل
+                    </button>
+                    <button type="button" class="list-group-item list-group-item-action" 
+                            onclick="insertVariableIntoEditor('{{verification_code}}')">
+                        <strong>{{verification_code}}</strong> - كود التحقق
+                    </button>
+                    <button type="button" class="list-group-item list-group-item-action" 
+                            onclick="insertVariableIntoEditor('{{order_number}}')">
+                        <strong>{{order_number}}</strong> - رقم الطلب
+                    </button>
+                    <button type="button" class="list-group-item list-group-item-action" 
+                            onclick="insertVariableIntoEditor('{{total_amount}}')">
+                        <strong>{{total_amount}}</strong> - المبلغ الإجمالي
+                    </button>
+                    <button type="button" class="list-group-item list-group-item-action" 
+                            onclick="insertVariableIntoEditor('{{current_year}}')">
+                        <strong>{{current_year}}</strong> - السنة الحالية
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// متغيرات عامة
+let previewMode = 'desktop';
+
+// تحديث قيم الألوان
+document.addEventListener('DOMContentLoaded', function() {
+    const primaryColor = document.getElementById('primary_color');
+    const secondaryColor = document.getElementById('secondary_color');
+    
+    if (primaryColor) {
+        primaryColor.addEventListener('input', function() {
+            document.getElementById('primary-color-value').textContent = this.value;
+            updateLivePreview();
+        });
+    }
+    
+    if (secondaryColor) {
+        secondaryColor.addEventListener('input', function() {
+            document.getElementById('secondary-color-value').textContent = this.value;
+            updateLivePreview();
+        });
+    }
+    
+    // تحديث المعاينة عند تغيير المحتوى
+    const htmlContent = document.getElementById('html_content');
+    if (htmlContent) {
+        htmlContent.addEventListener('input', updateLivePreview);
+    }
+    
+    // تحديث المعاينة الأولية
+    updateLivePreview();
+});
+
+// تحديث المعاينة المباشرة
+function updateLivePreview() {
+    const htmlContent = document.getElementById('html_content').value;
+    const primaryColor = document.getElementById('primary_color').value || '#007bff';
+    const secondaryColor = document.getElementById('secondary_color').value || '#6c757d';
+    
+    if (!htmlContent.trim()) {
+        document.getElementById('live-preview').innerHTML = `
+            <div class="text-center text-muted">
+                <i class="bi bi-eye-slash" style="font-size: 2rem;"></i>
+                <p class="mt-2">ابدأ بكتابة محتوى القالب</p>
+            </div>
+        `;
+        return;
+    }
+    
+    // استبدال المتغيرات للمعاينة
+    let previewContent = htmlContent
+        .replace(/\{\{company_name\}\}/g, '{{ current_user.company_name }}')
+        .replace(/\{\{current_year\}\}/g, new Date().getFullYear())
+        .replace(/\{\{primary_color\}\}/g, primaryColor)
+        .replace(/\{\{secondary_color\}\}/g, secondaryColor)
+        .replace(/\{\{verification_code\}\}/g, '123456')
+        .replace(/\{\{customer_name\}\}/g, 'أحمد محمد')
+        .replace(/\{\{order_number\}\}/g, '12345')
+        .replace(/\{\{total_amount\}\}/g, '250.00')
+        .replace(/\{\{message_title\}\}/g, 'عنوان الرسالة')
+        .replace(/\{\{message_content\}\}/g, 'هذا محتوى تجريبي للرسالة')
+        .replace(/\{\{logo\}\}/g, '<div style="color: #999; font-size: 12px;">[الشعار]</div>');
+    
+    const previewContainer = document.getElementById('live-preview');
+    previewContainer.innerHTML = previewContent;
+    
+    // تطبيق نمط المعاينة حسب الجهاز
+    if (previewMode === 'mobile') {
+        previewContainer.style.maxWidth = '320px';
+        previewContainer.style.fontSize = '14px';
+    } else {
+        previewContainer.style.maxWidth = '100%';
+        previewContainer.style.fontSize = '16px';
+    }
+}
+
+// تغيير وضع المعاينة
+function setPreviewMode(mode) {
+    previewMode = mode;
+    
+    // تحديث الأزرار
+    document.querySelectorAll('.btn-group .btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    event.target.classList.add('active');
+    
+    updateLivePreview();
+}
+
+// إدراج متغير
+function insertVariable() {
+    const modal = new bootstrap.Modal(document.getElementById('variableModal'));
+    modal.show();
+}
+
+// إدراج متغير في المحرر
+function insertVariableIntoEditor(variable) {
+    const editor = document.getElementById('html_content');
+    const cursorPos = editor.selectionStart;
+    const textBefore = editor.value.substring(0, cursorPos);
+    const textAfter = editor.value.substring(cursorPos);
+    
+    editor.value = textBefore + variable + textAfter;
+    editor.focus();
+    editor.setSelectionRange(cursorPos + variable.length, cursorPos + variable.length);
+    
+    // إغلاق Modal وتحديث المعاينة
+    bootstrap.Modal.getInstance(document.getElementById('variableModal')).hide();
+    updateLivePreview();
+}
+
+// تحميل قالب جاهز
+function loadTemplate(templateType) {
+    const templates = {
+        verification: `<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>كود التحقق</title>
+</head>
+<body style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 20px; background-color: #f4f4f4;">
+    <div style="max-width: 600px; margin: 0 auto; background-color: white; border-radius: 10px; box-shadow: 0 0 20px rgba(0,0,0,0.1);">
+        <div style="background: linear-gradient(135deg, {{primary_color}} 0%, {{secondary_color}} 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0;">
+            {{logo}}
+            <h1 style="margin: 10px 0 0 0; font-size: 24px;">{{company_name}}</h1>
+        </div>
+        <div style="padding: 30px;">
+            <h2 style="color: {{primary_color}}; margin-bottom: 20px;">كود التحقق</h2>
+            <p style="font-size: 16px; line-height: 1.6; margin-bottom: 20px;">مرحباً،</p>
+            <p style="font-size: 16px; line-height: 1.6; margin-bottom: 30px;">كود التحقق الخاص بك هو:</p>
+            <div style="background-color: #f8f9fa; border: 2px dashed {{primary_color}}; border-radius: 10px; padding: 20px; text-align: center; margin: 30px 0;">
+                <span style="font-size: 36px; font-weight: bold; color: {{primary_color}}; letter-spacing: 5px;">{{verification_code}}</span>
+            </div>
+            <p style="font-size: 14px; color: #6c757d; margin-top: 20px;">هذا الكود صالح لمدة محدودة. يرجى عدم مشاركته مع أي شخص آخر.</p>
+        </div>
+        <div style="background-color: #f8f9fa; padding: 20px; text-align: center; border-radius: 0 0 10px 10px; color: #6c757d; font-size: 14px;">
+            <p>© {{current_year}} {{company_name}}. جميع الحقوق محفوظة.</p>
+        </div>
+    </div>
+</body>
+</html>`,
+        
+        welcome: `<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مرحباً بك</title>
+</head>
+<body style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 20px; background-color: #f4f4f4;">
+    <div style="max-width: 600px; margin: 0 auto; background-color: white; border-radius: 10px; box-shadow: 0 0 20px rgba(0,0,0,0.1);">
+        <div style="background: linear-gradient(135deg, {{primary_color}} 0%, {{secondary_color}} 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0;">
+            {{logo}}
+            <h1 style="margin: 10px 0 0 0; font-size: 24px;">{{company_name}}</h1>
+        </div>
+        <div style="padding: 30px;">
+            <h2 style="color: {{primary_color}}; margin-bottom: 20px;">مرحباً بك!</h2>
+            <p style="font-size: 18px; line-height: 1.8; margin-bottom: 20px;">أهلاً وسهلاً {{customer_name}},</p>
+            <p style="font-size: 16px; line-height: 1.6; margin-bottom: 20px;">نحن سعداء جداً بانضمامك إلينا! مرحباً بك في عائلة {{company_name}}.</p>
+            <div style="background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%); border-radius: 10px; padding: 25px; margin: 25px 0; text-align: center;">
+                <h3 style="color: {{primary_color}}; margin: 0 0 15px 0;">نصائح للبداية:</h3>
+                <ul style="list-style: none; padding: 0; margin: 0;">
+                    <li style="margin: 10px 0;">✓ اكتشف خدماتنا المميزة</li>
+                    <li style="margin: 10px 0;">✓ تواصل معنا إذا كان لديك أي استفسار</li>
+                    <li style="margin: 10px 0;">✓ ابق على اطلاع بآخر العروض</li>
+                </ul>
+            </div>
+            <p style="font-size: 16px; line-height: 1.6;">نتطلع إلى خدمتك وتقديم أفضل تجربة ممكنة.</p>
+        </div>
+        <div style="background-color: #f8f9fa; padding: 20px; text-align: center; border-radius: 0 0 10px 10px; color: #6c757d; font-size: 14px;">
+            <p>© {{current_year}} {{company_name}}. جميع الحقوق محفوظة.</p>
+        </div>
+    </div>
+</body>
+</html>`,
+        
+        order: `<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تفاصيل الطلب</title>
+</head>
+<body style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 20px; background-color: #f4f4f4;">
+    <div style="max-width: 600px; margin: 0 auto; background-color: white; border-radius: 10px; box-shadow: 0 0 20px rgba(0,0,0,0.1);">
+        <div style="background: linear-gradient(135deg, {{primary_color}} 0%, {{secondary_color}} 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0;">
+            {{logo}}
+            <h1 style="margin: 10px 0 0 0; font-size: 24px;">{{company_name}}</h1>
+        </div>
+        <div style="padding: 30px;">
+            <h2 style="color: {{primary_color}}; margin-bottom: 20px;">تفاصيل الطلب</h2>
+            <p style="font-size: 16px; line-height: 1.6; margin-bottom: 20px;">عزيزي {{customer_name}},</p>
+            <p style="font-size: 16px; line-height: 1.6; margin-bottom: 20px;">شكراً لك على طلبك. إليك التفاصيل:</p>
+            <div style="background-color: #f8f9fa; border-radius: 10px; padding: 20px; margin: 20px 0;">
+                <p><strong>رقم الطلب:</strong> {{order_number}}</p>
+                <p><strong>تاريخ الطلب:</strong> {{order_date}}</p>
+                <p><strong>المبلغ الإجمالي:</strong> {{total_amount}} جنيه</p>
+                <p><strong>حالة الطلب:</strong> {{order_status}}</p>
+            </div>
+            <p style="font-size: 16px; line-height: 1.6;">سنقوم بتحديثك بأي تطورات على طلبك.</p>
+        </div>
+        <div style="background-color: #f8f9fa; padding: 20px; text-align: center; border-radius: 0 0 10px 10px; color: #6c757d; font-size: 14px;">
+            <p>© {{current_year}} {{company_name}}. جميع الحقوق محفوظة.</p>
+        </div>
+    </div>
+</body>
+</html>`,
+        
+        general: `<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{message_title}}</title>
+</head>
+<body style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 20px; background-color: #f4f4f4;">
+    <div style="max-width: 600px; margin: 0 auto; background-color: white; border-radius: 10px; box-shadow: 0 0 20px rgba(0,0,0,0.1);">
+        <div style="background: linear-gradient(135deg, {{primary_color}} 0%, {{secondary_color}} 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0;">
+            {{logo}}
+            <h1 style="margin: 10px 0 0 0; font-size: 24px;">{{company_name}}</h1>
+        </div>
+        <div style="padding: 30px;">
+            <h2 style="color: {{primary_color}}; margin-bottom: 20px;">{{message_title}}</h2>
+            <p style="font-size: 16px; line-height: 1.6; margin-bottom: 20px;">{{message_content}}</p>
+        </div>
+        <div style="background-color: #f8f9fa; padding: 20px; text-align: center; border-radius: 0 0 10px 10px; color: #6c757d; font-size: 14px;">
+            <p>© {{current_year}} {{company_name}}. جميع الحقوق محفوظة.</p>
+        </div>
+    </div>
+</body>
+</html>`
+    };
+    
+    if (templates[templateType]) {
+        document.getElementById('html_content').value = templates[templateType];
+        updateLivePreview();
+        showMessage('تم تحميل القالب بنجاح!', 'success');
+    }
+}
+</script>
+{% endblock %}

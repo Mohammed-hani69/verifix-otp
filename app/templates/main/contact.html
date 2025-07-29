@@ -1,0 +1,435 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="hero-section text-center text-white py-5 mb-0">
+    <div class="container">
+        <h1 class="display-4 fw-bold mb-4">
+            <i class="bi bi-telephone"></i>
+            تواصل معنا
+        </h1>
+        <p class="lead">
+            نحن هنا لمساعدتك! تواصل معنا في أي وقت
+        </p>
+    </div>
+</div>
+
+<div class="container my-5">
+    <div class="row">
+        <!-- نموذج التواصل -->
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="mb-0">
+                        <i class="bi bi-envelope"></i>
+                        أرسل لنا رسالة
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <form id="contactForm">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">الاسم الكامل *</label>
+                                <input type="text" class="form-control" name="name" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">البريد الإلكتروني *</label>
+                                <input type="email" class="form-control" name="email" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">رقم الهاتف</label>
+                                <input type="tel" class="form-control" name="phone">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">نوع الاستفسار *</label>
+                                <select class="form-select" name="inquiry_type" required>
+                                    <option value="">اختر نوع الاستفسار</option>
+                                    <option value="technical">دعم فني</option>
+                                    <option value="sales">استفسار مبيعات</option>
+                                    <option value="billing">استفسار مالي</option>
+                                    <option value="feature">طلب ميزة جديدة</option>
+                                    <option value="partnership">شراكة تجارية</option>
+                                    <option value="other">أخرى</option>
+                                </select>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label fw-bold">الموضوع *</label>
+                                <input type="text" class="form-control" name="subject" required>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label fw-bold">الرسالة *</label>
+                                <textarea class="form-control" name="message" rows="6" required 
+                                          placeholder="اكتب رسالتك هنا..."></textarea>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="privacy" required>
+                                <label class="form-check-label" for="privacy">
+                                    أوافق على <a href="#" class="text-decoration-none">سياسة الخصوصية</a> و 
+                                    <a href="#" class="text-decoration-none">شروط الاستخدام</a>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="d-grid mt-4">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="bi bi-send"></i> إرسال الرسالة
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- معلومات التواصل -->
+        <div class="col-lg-4">
+            <!-- طرق التواصل -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-info-circle"></i>
+                        معلومات التواصل
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="bg-primary text-white rounded-circle p-3 me-3">
+                            <i class="bi bi-envelope"></i>
+                        </div>
+                        <div>
+                            <h6 class="mb-0">البريد الإلكتروني</h6>
+                            <a href="mailto:{{ config.ADMIN_EMAIL }}" class="text-muted">
+                                {{ config.ADMIN_EMAIL }}
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="bg-success text-white rounded-circle p-3 me-3">
+                            <i class="bi bi-telephone"></i>
+                        </div>
+                        <div>
+                            <h6 class="mb-0">الهاتف</h6>
+                            <a href="tel:+201234567890" class="text-muted">
+                                +20 123 456 7890
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="bg-info text-white rounded-circle p-3 me-3">
+                            <i class="bi bi-chat-dots"></i>
+                        </div>
+                        <div>
+                            <h6 class="mb-0">واتساب</h6>
+                            <a href="https://wa.me/201234567890" class="text-muted" target="_blank">
+                                +20 123 456 7890
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex align-items-center">
+                        <div class="bg-warning text-white rounded-circle p-3 me-3">
+                            <i class="bi bi-geo-alt"></i>
+                        </div>
+                        <div>
+                            <h6 class="mb-0">العنوان</h6>
+                            <span class="text-muted">
+                                القاهرة، مصر
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ساعات العمل -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-clock"></i>
+                        ساعات العمل
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>السبت - الخميس</span>
+                        <span class="text-muted">9:00 ص - 6:00 م</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>الجمعة</span>
+                        <span class="text-muted">مغلق</span>
+                    </div>
+                    <hr>
+                    <div class="alert alert-success small mb-0">
+                        <i class="bi bi-check-circle"></i>
+                        <strong>الدعم الفني:</strong> متاح 24/7
+                    </div>
+                </div>
+            </div>
+
+            <!-- روابط التواصل الاجتماعي -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-share"></i>
+                        تابعنا على
+                    </h5>
+                </div>
+                <div class="card-body text-center">
+                    <div class="d-flex justify-content-center gap-3">
+                        <a href="#" class="btn btn-outline-primary rounded-circle p-3">
+                            <i class="bi bi-facebook"></i>
+                        </a>
+                        <a href="#" class="btn btn-outline-info rounded-circle p-3">
+                            <i class="bi bi-twitter"></i>
+                        </a>
+                        <a href="#" class="btn btn-outline-primary rounded-circle p-3">
+                            <i class="bi bi-linkedin"></i>
+                        </a>
+                        <a href="#" class="btn btn-outline-danger rounded-circle p-3">
+                            <i class="bi bi-youtube"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- الأسئلة الشائعة -->
+    <div class="row mt-5">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header text-center">
+                    <h3 class="mb-0">
+                        <i class="bi bi-question-circle"></i>
+                        أسئلة شائعة
+                    </h3>
+                    <p class="mb-0 text-muted">ربما تجد إجابة سؤالك هنا</p>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="accordion" id="faqAccordion1">
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header" id="faq1">
+                                        <button class="accordion-button collapsed" type="button" 
+                                                data-bs-toggle="collapse" data-bs-target="#collapse1">
+                                            كيف أبدأ في استخدام الخدمة؟
+                                        </button>
+                                    </h2>
+                                    <div id="collapse1" class="accordion-collapse collapse" 
+                                         data-bs-parent="#faqAccordion1">
+                                        <div class="accordion-body">
+                                            ببساطة قم بإنشاء حساب مجاني واحصل على مفتاح API الخاص بك. 
+                                            ستحصل على 1000 رسالة مجانية للبدء فوراً.
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header" id="faq2">
+                                        <button class="accordion-button collapsed" type="button" 
+                                                data-bs-toggle="collapse" data-bs-target="#collapse2">
+                                            هل الخدمة آمنة؟
+                                        </button>
+                                    </h2>
+                                    <div id="collapse2" class="accordion-collapse collapse" 
+                                         data-bs-parent="#faqAccordion1">
+                                        <div class="accordion-body">
+                                            نعم، نستخدم أحدث معايير الأمان والتشفير لحماية بياناتك 
+                                            ورسائلك. جميع الاتصالات مشفرة بـ SSL.
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header" id="faq3">
+                                        <button class="accordion-button collapsed" type="button" 
+                                                data-bs-toggle="collapse" data-bs-target="#collapse3">
+                                            ما هو وقت الاستجابة للدعم؟
+                                        </button>
+                                    </h2>
+                                    <div id="collapse3" class="accordion-collapse collapse" 
+                                         data-bs-parent="#faqAccordion1">
+                                        <div class="accordion-body">
+                                            نرد على جميع الاستفسارات خلال 24 ساعة كحد أقصى، 
+                                            والحالات العاجلة خلال ساعات قليلة.
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="accordion" id="faqAccordion2">
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header" id="faq4">
+                                        <button class="accordion-button collapsed" type="button" 
+                                                data-bs-toggle="collapse" data-bs-target="#collapse4">
+                                            هل يمكنني تجربة الخدمة مجاناً؟
+                                        </button>
+                                    </h2>
+                                    <div id="collapse4" class="accordion-collapse collapse" 
+                                         data-bs-parent="#faqAccordion2">
+                                        <div class="accordion-body">
+                                            بالطبع! تحصل على 1000 رسالة مجانية عند التسجيل، 
+                                            بدون الحاجة لبطاقة ائتمان.
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header" id="faq5">
+                                        <button class="accordion-button collapsed" type="button" 
+                                                data-bs-toggle="collapse" data-bs-target="#collapse5">
+                                            هل تدعمون التكامل مع المواقع؟
+                                        </button>
+                                    </h2>
+                                    <div id="collapse5" class="accordion-collapse collapse" 
+                                         data-bs-parent="#faqAccordion2">
+                                        <div class="accordion-body">
+                                            نعم، توفر خدمتنا API سهل الاستخدام يمكن تكامله مع أي موقع 
+                                            أو تطبيق باستخدام HTTP requests بسيطة.
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header" id="faq6">
+                                        <button class="accordion-button collapsed" type="button" 
+                                                data-bs-toggle="collapse" data-bs-target="#collapse6">
+                                            ما هي لغات البرمجة المدعومة؟
+                                        </button>
+                                    </h2>
+                                    <div id="collapse6" class="accordion-collapse collapse" 
+                                         data-bs-parent="#faqAccordion2">
+                                        <div class="accordion-body">
+                                            يمكن استخدام خدمتنا مع أي لغة برمجة تدعم HTTP requests 
+                                            مثل PHP، Python، JavaScript، Java، C#، وغيرها.
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="text-center mt-4">
+                        <p class="text-muted">لم تجد إجابة سؤالك؟</p>
+                        <a href="{{ url_for('main.documentation') }}" class="btn btn-outline-primary me-2">
+                            <i class="bi bi-book"></i> التوثيق الكامل
+                        </a>
+                        <button class="btn btn-primary" onclick="scrollToContactForm()">
+                            <i class="bi bi-envelope"></i> اسأل سؤالك
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// معالجة نموذج التواصل
+document.getElementById('contactForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(this);
+    const data = Object.fromEntries(formData);
+    
+    // محاكاة إرسال النموذج
+    const submitBtn = this.querySelector('button[type="submit"]');
+    setLoading(submitBtn, true);
+    
+    setTimeout(() => {
+        showMessage('تم إرسال رسالتك بنجاح! سنرد عليك في أقرب وقت.', 'success');
+        this.reset();
+        setLoading(submitBtn, false);
+    }, 2000);
+});
+
+// التمرير إلى نموذج التواصل
+function scrollToContactForm() {
+    document.getElementById('contactForm').scrollIntoView({
+        behavior: 'smooth',
+        block: 'start'
+    });
+    
+    // تركيز على أول حقل
+    setTimeout(() => {
+        document.querySelector('#contactForm input[name="name"]').focus();
+    }, 500);
+}
+
+// تحسين تجربة المستخدم
+document.addEventListener('DOMContentLoaded', function() {
+    // إضافة تأثيرات على البطاقات
+    const cards = document.querySelectorAll('.card');
+    cards.forEach(card => {
+        card.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-2px)';
+        });
+        
+        card.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+        });
+    });
+    
+    // تحسين النموذج
+    const inputs = document.querySelectorAll('#contactForm input, #contactForm textarea, #contactForm select');
+    inputs.forEach(input => {
+        input.addEventListener('focus', function() {
+            this.parentElement.classList.add('focused');
+        });
+        
+        input.addEventListener('blur', function() {
+            this.parentElement.classList.remove('focused');
+        });
+    });
+    
+    // إضافة مؤثرات على الروابط الاجتماعية
+    const socialLinks = document.querySelectorAll('.btn.rounded-circle');
+    socialLinks.forEach(link => {
+        link.addEventListener('mouseenter', function() {
+            this.style.transform = 'scale(1.1)';
+        });
+        
+        link.addEventListener('mouseleave', function() {
+            this.style.transform = 'scale(1)';
+        });
+    });
+});
+
+// إضافة إحصائيات بصرية
+function animateContactStats() {
+    // محاكاة إحصائيات الاستجابة
+    const responseTime = document.createElement('div');
+    responseTime.className = 'alert alert-info mt-3';
+    responseTime.innerHTML = `
+        <div class="row text-center">
+            <div class="col-4">
+                <h5 class="text-info mb-0" id="avgResponseTime">< 2</h5>
+                <small>ساعات متوسط الاستجابة</small>
+            </div>
+            <div class="col-4">
+                <h5 class="text-success mb-0" id="satisfactionRate">98%</h5>
+                <small>رضا العملاء</small>
+            </div>
+            <div class="col-4">
+                <h5 class="text-warning mb-0" id="supportTickets">500+</h5>
+                <small>طلب دعم مُحل</small>
+            </div>
+        </div>
+    `;
+    
+    // إضافة الإحصائيات بعد بطاقة معلومات التواصل
+    const contactCard = document.querySelector('.card');
+    contactCard.parentNode.insertBefore(responseTime, contactCard.nextSibling);
+}
+
+// تشغيل الإحصائيات عند تحميل الصفحة
+setTimeout(animateContactStats, 1000);
+</script>
+{% endblock %}

@@ -1,0 +1,412 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="dashboard-card">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <h2 class="text-gradient mb-2">
+                            <i class="bi bi-wallet2"></i>
+                            إدارة الرصيد
+                        </h2>
+                        <p class="text-muted mb-0">شحن رصيدك ومتابعة استهلاك الرسائل</p>
+                    </div>
+                    <div class="col-md-4 text-end">
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="badge bg-success fs-6">
+                                الرصيد الحالي: {{ "%.2f"|format(current_user.balance) }} ج
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- نموذج إضافة رصيد -->
+        <div class="col-lg-6">
+            <div class="card dashboard-card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-plus-circle"></i>
+                        شحن الرصيد
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        {{ form.hidden_tag() }}
+                        
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">اختر المبلغ:</label>
+                            <div class="row g-2">
+                                <div class="col-4">
+                                    <button type="button" class="btn btn-outline-primary w-100 amount-btn" data-amount="50">
+                                        50 ج
+                                    </button>
+                                </div>
+                                <div class="col-4">
+                                    <button type="button" class="btn btn-outline-primary w-100 amount-btn" data-amount="100">
+                                        100 ج
+                                    </button>
+                                </div>
+                                <div class="col-4">
+                                    <button type="button" class="btn btn-outline-primary w-100 amount-btn" data-amount="200">
+                                        200 ج
+                                    </button>
+                                </div>
+                                <div class="col-4">
+                                    <button type="button" class="btn btn-outline-primary w-100 amount-btn" data-amount="500">
+                                        500 ج
+                                    </button>
+                                </div>
+                                <div class="col-4">
+                                    <button type="button" class="btn btn-outline-primary w-100 amount-btn" data-amount="1000">
+                                        1000 ج
+                                    </button>
+                                </div>
+                                <div class="col-4">
+                                    <button type="button" class="btn btn-outline-secondary w-100" onclick="toggleCustomAmount()">
+                                        مخصص
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            {{ form.amount.label(class="form-label fw-bold") }}
+                            {{ form.amount(class="form-control form-control-lg text-center", placeholder="أدخل المبلغ بالجنيه") }}
+                            {% if form.amount.errors %}
+                                <div class="text-danger small">{{ form.amount.errors[0] }}</div>
+                            {% endif %}
+                        </div>
+
+                        <!-- معلومات الشحن -->
+                        <div class="alert alert-info">
+                            <div class="row align-items-center">
+                                <div class="col-md-6">
+                                    <small>
+                                        <i class="bi bi-calculator"></i>
+                                        <strong>عدد الرسائل:</strong> <span id="messages-count">0</span>
+                                    </small>
+                                </div>
+                                <div class="col-md-6">
+                                    <small>
+                                        <i class="bi bi-tag"></i>
+                                        تكلفة الرسالة: {{ config.MESSAGE_PRICE }} جنيه
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-grid">
+                            {{ form.submit(class="btn btn-success btn-lg") }}
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- طرق الدفع -->
+            <div class="card dashboard-card mt-4">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-credit-card"></i>
+                        طرق الدفع المتاحة
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-warning">
+                        <i class="bi bi-info-circle"></i>
+                        <strong>ملاحظة:</strong> هذا نظام تجريبي. في النسخة الفعلية سيتم ربط بوابات الدفع الحقيقية.
+                    </div>
+                    
+                    <div class="row text-center">
+                        <div class="col-md-4 mb-3">
+                            <div class="border rounded p-3">
+                                <i class="bi bi-credit-card text-primary" style="font-size: 2rem;"></i>
+                                <h6 class="mt-2">فيزا/ماستركارد</h6>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="border rounded p-3">
+                                <i class="bi bi-phone text-success" style="font-size: 2rem;"></i>
+                                <h6 class="mt-2">فودافون كاش</h6>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="border rounded p-3">
+                                <i class="bi bi-bank text-info" style="font-size: 2rem;"></i>
+                                <h6 class="mt-2">تحويل بنكي</h6>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- معلومات الحساب والإحصائيات -->
+        <div class="col-lg-6">
+            <!-- معلومات الرصيد -->
+            <div class="card dashboard-card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-info-circle"></i>
+                        تفاصيل الحساب
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="text-center p-3 bg-primary text-white rounded">
+                                <h4>{{ "%.2f"|format(current_user.balance) }}</h4>
+                                <small>الرصيد الحالي (جنيه)</small>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="text-center p-3 bg-success text-white rounded">
+                                <h4>{{ config.FREE_MESSAGES_LIMIT - current_user.free_messages_used }}</h4>
+                                <small>رسائل مجانية متبقية</small>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="text-center p-3 bg-info text-white rounded">
+                                <h4>{{ current_user.total_messages_sent }}</h4>
+                                <small>إجمالي الرسائل المرسلة</small>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="text-center p-3 bg-warning text-white rounded">
+                                <h4>{{ (current_user.balance / config.MESSAGE_PRICE)|int }}</h4>
+                                <small>رسائل متاحة من الرصيد</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- الخطط المقترحة -->
+            <div class="card dashboard-card mt-4">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-star"></i>
+                        خطط موصى بها
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="card text-center">
+                                <div class="card-body">
+                                    <h5 class="text-primary">خطة أساسية</h5>
+                                    <h3>200 ج</h3>
+                                    <p class="small text-muted">800 رسالة</p>
+                                    <button class="btn btn-outline-primary btn-sm amount-btn" data-amount="200">
+                                        اختيار
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card text-center border-primary">
+                                <div class="card-body">
+                                    <h5 class="text-primary">خطة متقدمة</h5>
+                                    <h3>500 ج</h3>
+                                    <p class="small text-muted">2000 رسالة</p>
+                                    <span class="badge bg-success mb-2">الأكثر شعبية</span>
+                                    <br>
+                                    <button class="btn btn-primary btn-sm amount-btn" data-amount="500">
+                                        اختيار
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- تحذيرات وملاحظات -->
+            {% if current_user.is_low_balance() %}
+            <div class="alert alert-warning mt-4">
+                <i class="bi bi-exclamation-triangle"></i>
+                <strong>تحذير:</strong> رصيدك منخفض! قم بالشحن الآن لتجنب انقطاع الخدمة.
+            </div>
+            {% endif %}
+
+            {% if current_user.free_messages_used >= config.FREE_MESSAGES_LIMIT %}
+            <div class="alert alert-info mt-4">
+                <i class="bi bi-info-circle"></i>
+                <strong>تم استنفاد الرسائل المجانية:</strong> تحتاج الآن لشحن رصيدك لإرسال المزيد من الرسائل.
+            </div>
+            {% endif %}
+
+            <!-- نصائح توفير -->
+            <div class="card dashboard-card mt-4">
+                <div class="card-header">
+                    <h6 class="mb-0">
+                        <i class="bi bi-lightbulb"></i>
+                        نصائح لتوفير الرصيد
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled mb-0">
+                        <li class="mb-2">
+                            <i class="bi bi-check-circle text-success me-2"></i>
+                            استخدم القوالب المحسنة لتقليل حجم الرسائل
+                        </li>
+                        <li class="mb-2">
+                            <i class="bi bi-check-circle text-success me-2"></i>
+                            راقب إحصائياتك لتحسين معدل النجاح
+                        </li>
+                        <li class="mb-2">
+                            <i class="bi bi-check-circle text-success me-2"></i>
+                            اشحن بكميات كبيرة للحصول على أفضل قيمة
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// متغيرات
+const MESSAGE_PRICE = {{ config.MESSAGE_PRICE }};
+
+// تحديث عداد الرسائل
+function updateMessagesCount() {
+    const amountInput = document.querySelector('#amount');
+    const messagesCountElement = document.getElementById('messages-count');
+    
+    if (amountInput && messagesCountElement) {
+        const amount = parseFloat(amountInput.value) || 0;
+        const messages = Math.floor(amount / MESSAGE_PRICE);
+        messagesCountElement.textContent = messages.toLocaleString();
+    }
+}
+
+// معالجة أزرار المبالغ المحددة مسبقاً
+function handleAmountButtons() {
+    const amountButtons = document.querySelectorAll('.amount-btn');
+    const amountInput = document.querySelector('#amount');
+    
+    amountButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const amount = this.dataset.amount;
+            if (amountInput) {
+                amountInput.value = amount;
+                updateMessagesCount();
+                
+                // تحديث الأزرار النشطة
+                amountButtons.forEach(btn => btn.classList.remove('btn-primary'));
+                amountButtons.forEach(btn => btn.classList.add('btn-outline-primary'));
+                this.classList.remove('btn-outline-primary');
+                this.classList.add('btn-primary');
+            }
+        });
+    });
+}
+
+// تفعيل/إلغاء المبلغ المخصص
+function toggleCustomAmount() {
+    const amountInput = document.querySelector('#amount');
+    const amountButtons = document.querySelectorAll('.amount-btn');
+    
+    // إلغاء تحديد جميع الأزرار
+    amountButtons.forEach(btn => {
+        btn.classList.remove('btn-primary');
+        btn.classList.add('btn-outline-primary');
+    });
+    
+    // تفعيل حقل الإدخال المخصص
+    if (amountInput) {
+        amountInput.focus();
+        amountInput.select();
+    }
+}
+
+// التحقق من صحة المبلغ
+function validateAmount() {
+    const amountInput = document.querySelector('#amount');
+    
+    if (amountInput) {
+        const amount = parseFloat(amountInput.value);
+        
+        if (isNaN(amount) || amount <= 0) {
+            amountInput.classList.add('is-invalid');
+            return false;
+        } else if (amount < 10) {
+            amountInput.classList.add('is-invalid');
+            showMessage('الحد الأدنى للشحن هو 10 جنيه', 'warning');
+            return false;
+        } else if (amount > 10000) {
+            amountInput.classList.add('is-invalid');
+            showMessage('الحد الأقصى للشحن هو 10000 جنيه', 'warning');
+            return false;
+        } else {
+            amountInput.classList.remove('is-invalid');
+            amountInput.classList.add('is-valid');
+            return true;
+        }
+    }
+    return false;
+}
+
+// تهيئة الصفحة
+document.addEventListener('DOMContentLoaded', function() {
+    const amountInput = document.querySelector('#amount');
+    
+    // ربط الأحداث
+    handleAmountButtons();
+    
+    if (amountInput) {
+        amountInput.addEventListener('input', function() {
+            updateMessagesCount();
+            validateAmount();
+        });
+        
+        amountInput.addEventListener('keypress', function(e) {
+            // السماح بالأرقام والنقطة فقط
+            const allowedKeys = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.', 'Backspace', 'Delete', 'Tab', 'Enter'];
+            if (!allowedKeys.includes(e.key)) {
+                e.preventDefault();
+            }
+        });
+    }
+    
+    // التحقق عند الإرسال
+    const form = document.querySelector('form');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            if (!validateAmount()) {
+                e.preventDefault();
+            }
+        });
+    }
+    
+    // تحديث العداد الأولي
+    updateMessagesCount();
+});
+
+// محاكاة عملية الدفع (للنسخة التجريبية)
+function simulatePayment(amount) {
+    const button = event.target;
+    setLoading(button, true);
+    
+    setTimeout(() => {
+        showMessage(`تم شحن ${amount} جنيه بنجاح!`, 'success');
+        
+        // تحديث الرصيد في الواجهة
+        setTimeout(() => {
+            location.reload();
+        }, 1000);
+        
+        setLoading(button, false);
+    }, 2000);
+}
+</script>
+{% endblock %}

@@ -1,0 +1,34 @@
+[Unit]
+Description=Email Sender Pro - Professional Email Service
+After=network.target
+Wants=network.target
+
+[Service]
+Type=notify
+User=www-data
+Group=www-data
+WorkingDirectory=/var/www/verifix-otp
+Environment=PATH=/var/www/verifix-otp/venv/bin
+Environment=FLASK_ENV=production
+ExecStart=/var/www/verifix-otp/venv/bin/gunicorn --config gunicorn.conf.py run:app
+ExecReload=/bin/kill -s HUP $MAINPID
+Restart=always
+RestartSec=3
+KillMode=mixed
+TimeoutStopSec=5
+
+# إعدادات الأمان
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+ReadWritePaths=/var/www/verifix-otp
+ReadWritePaths=/var/log/email_sender
+ReadWritePaths=/tmp
+
+# إعدادات الموارد
+LimitNOFILE=65536
+MemoryAccounting=yes
+MemoryMax=1G
+
+[Install]
+WantedBy=multi-user.target
