@@ -3,7 +3,14 @@
 {% block content %}
 <div class="container-fluid">
     <!-- Header -->
-    <div class="row mb-4">
+                          <div class="d-grid gap-2">
+                            <a href="{{ url_for('auth.balance_request') }}" class="btn btn-success btn-lg">
+                                <i class="bi bi-credit-card"></i> طلب شحن الرصيد
+                            </a>
+                            <small class="text-muted text-center">
+                                قم بتحويل المبلغ إلى 01033607749 وارفع صورة الإيصال
+                            </small>
+                        </div>div class="row mb-4">
         <div class="col-12">
             <div class="dashboard-card">
                 <div class="row align-items-center">

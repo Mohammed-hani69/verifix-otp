@@ -1,0 +1,321 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="dashboard-card">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <h2 class="text-gradient mb-2">
+                            <i class="bi bi-credit-card"></i>
+                            إدارة طلبات شحن الرصيد
+                        </h2>
+                        <p class="text-muted mb-0">مراجعة والموافقة على طلبات شحن الرصيد من الشركات</p>
+                    </div>
+                    <div class="col-md-4 text-end">
+                        <a href="{{ url_for('admin.dashboard') }}" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-right"></i> العودة للوحة التحكم
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- الفلاتر -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card dashboard-card">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-md-6">
+                            <div class="btn-group" role="group">
+                                <a href="{{ url_for('admin.balance_requests', status='all') }}" 
+                                   class="btn {% if status_filter == 'all' %}btn-primary{% else %}btn-outline-primary{% endif %}">
+                                    الكل
+                                </a>
+                                <a href="{{ url_for('admin.balance_requests', status='pending') }}" 
+                                   class="btn {% if status_filter == 'pending' %}btn-warning{% else %}btn-outline-warning{% endif %}">
+                                    في الانتظار
+                                </a>
+                                <a href="{{ url_for('admin.balance_requests', status='approved') }}" 
+                                   class="btn {% if status_filter == 'approved' %}btn-success{% else %}btn-outline-success{% endif %}">
+                                    مقبولة
+                                </a>
+                                <a href="{{ url_for('admin.balance_requests', status='rejected') }}" 
+                                   class="btn {% if status_filter == 'rejected' %}btn-danger{% else %}btn-outline-danger{% endif %}">
+                                    مرفوضة
+                                </a>
+                            </div>
+                        </div>
+                        <div class="col-md-6 text-end">
+                            <div class="text-muted">
+                                إجمالي الطلبات: {{ requests.total }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- قائمة الطلبات -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card dashboard-card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-list"></i>
+                        طلبات شحن الرصيد
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if requests.items %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>الشركة</th>
+                                        <th>المبلغ المطلوب</th>
+                                        <th>رقم التحويل</th>
+                                        <th>تاريخ الطلب</th>
+                                        <th>الحالة</th>
+                                        <th>المعالج</th>
+                                        <th width="150">الإجراءات</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for request in requests.items %}
+                                    <tr>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <i class="bi bi-building text-primary me-2"></i>
+                                                <div>
+                                                    <strong>{{ request.company.company_name }}</strong>
+                                                    <div class="small text-muted">{{ request.company.email }}</div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <strong class="text-success">{{ "%.2f"|format(request.amount) }} جنيه</strong>
+                                        </td>
+                                        <td>
+                                            {% if request.transfer_number %}
+                                                <code>{{ request.transfer_number }}</code>
+                                            {% else %}
+                                                <span class="text-muted">غير محدد</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <div>{{ request.created_at.strftime('%Y-%m-%d') }}</div>
+                                            <small class="text-muted">{{ request.created_at.strftime('%H:%M') }}</small>
+                                        </td>
+                                        <td>
+                                            {% if request.status == 'pending' %}
+                                                <span class="badge bg-warning">في الانتظار</span>
+                                            {% elif request.status == 'approved' %}
+                                                <span class="badge bg-success">مقبول</span>
+                                            {% else %}
+                                                <span class="badge bg-danger">مرفوض</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if request.approver %}
+                                                <div class="small">
+                                                    <strong>{{ request.approver.company_name }}</strong>
+                                                    <div class="text-muted">{{ request.processed_at.strftime('%Y-%m-%d %H:%M') if request.processed_at }}</div>
+                                                </div>
+                                            {% else %}
+                                                <span class="text-muted">-</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <div class="btn-group btn-group-sm">
+                                                {% if request.transfer_receipt %}
+                                                    <button type="button" class="btn btn-outline-info" 
+                                                            onclick="viewReceipt('{{ url_for('admin.uploaded_file', filename=request.transfer_receipt) }}')" 
+                                                            title="عرض الإيصال">
+                                                        <i class="bi bi-image"></i>
+                                                    </button>
+                                                {% endif %}
+                                                <a href="{{ url_for('admin.balance_request_detail', id=request.id) }}" 
+                                                   class="btn btn-outline-primary" title="التفاصيل">
+                                                    <i class="bi bi-eye"></i>
+                                                </a>
+                                                {% if request.status == 'pending' %}
+                                                    <button type="button" class="btn btn-outline-success" 
+                                                            onclick="quickApprove({{ request.id }})" title="موافقة سريعة">
+                                                        <i class="bi bi-check"></i>
+                                                    </button>
+                                                    <button type="button" class="btn btn-outline-danger" 
+                                                            onclick="quickReject({{ request.id }})" title="رفض سريع">
+                                                        <i class="bi bi-x"></i>
+                                                    </button>
+                                                {% endif %}
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- التقسيم -->
+                        {% if requests.pages > 1 %}
+                        <nav class="mt-4">
+                            <ul class="pagination justify-content-center">
+                                {% if requests.has_prev %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="{{ url_for('admin.balance_requests', page=requests.prev_num, status=status_filter) }}">
+                                            السابق
+                                        </a>
+                                    </li>
+                                {% endif %}
+                                
+                                {% for page_num in requests.iter_pages() %}
+                                    {% if page_num %}
+                                        {% if page_num != requests.page %}
+                                            <li class="page-item">
+                                                <a class="page-link" href="{{ url_for('admin.balance_requests', page=page_num, status=status_filter) }}">
+                                                    {{ page_num }}
+                                                </a>
+                                            </li>
+                                        {% else %}
+                                            <li class="page-item active">
+                                                <span class="page-link">{{ page_num }}</span>
+                                            </li>
+                                        {% endif %}
+                                    {% else %}
+                                        <li class="page-item disabled">
+                                            <span class="page-link">...</span>
+                                        </li>
+                                    {% endif %}
+                                {% endfor %}
+                                
+                                {% if requests.has_next %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="{{ url_for('admin.balance_requests', page=requests.next_num, status=status_filter) }}">
+                                            التالي
+                                        </a>
+                                    </li>
+                                {% endif %}
+                            </ul>
+                        </nav>
+                        {% endif %}
+                    {% else %}
+                        <div class="text-center py-5">
+                            <i class="bi bi-inbox text-muted" style="font-size: 3rem;"></i>
+                            <h5 class="text-muted mt-3">لا توجد طلبات شحن</h5>
+                            <p class="text-muted">لم يتم العثور على طلبات شحن تطابق الفلتر المحدد</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal الموافقة السريعة -->
+<div class="modal fade" id="quickApproveModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title">موافقة على الطلب</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="approve-form" method="POST">
+                <div class="modal-body">
+                    <div class="alert alert-success">
+                        <i class="bi bi-check-circle"></i>
+                        هل تريد الموافقة على هذا الطلب؟ سيتم إضافة الرصيد فوراً للشركة.
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">ملاحظات إدارية (اختياري)</label>
+                        <textarea name="admin_notes" class="form-control" rows="3" placeholder="أي ملاحظات حول الموافقة..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                    <button type="submit" name="submit_approve" value="true" class="btn btn-success">
+                        <i class="bi bi-check"></i> موافقة
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal عرض الإيصال -->
+<div class="modal fade" id="receiptModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">إيصال التحويل</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body text-center">
+                <img id="receiptImage" src="" class="img-fluid" alt="إيصال التحويل">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إغلاق</button>
+                <a id="downloadReceiptLink" href="" target="_blank" class="btn btn-primary">
+                    <i class="bi bi-download"></i> تحميل
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal الموافقة السريعة -->
+<div class="modal fade" id="quickRejectModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title">رفض الطلب</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="reject-form" method="POST">
+                <div class="modal-body">
+                    <div class="alert alert-danger">
+                        <i class="bi bi-exclamation-triangle"></i>
+                        هل تريد رفض هذا الطلب؟ لن يتم إضافة أي رصيد للشركة.
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">سبب الرفض <span class="text-danger">*</span></label>
+                        <textarea name="admin_notes" class="form-control" rows="3" 
+                                  placeholder="يرجى تحديد سبب رفض الطلب..." required></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                    <button type="submit" name="submit_reject" value="true" class="btn btn-danger">
+                        <i class="bi bi-x"></i> رفض
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+function viewReceipt(imageUrl) {
+    document.getElementById('receiptImage').src = imageUrl;
+    document.getElementById('downloadReceiptLink').href = imageUrl;
+    new bootstrap.Modal(document.getElementById('receiptModal')).show();
+}
+
+function quickApprove(requestId) {
+    document.getElementById('approve-form').action = `/admin/balance-request/${requestId}`;
+    const modal = new bootstrap.Modal(document.getElementById('quickApproveModal'));
+    modal.show();
+}
+
+function quickReject(requestId) {
+    document.getElementById('reject-form').action = `/admin/balance-request/${requestId}`;
+    const modal = new bootstrap.Modal(document.getElementById('quickRejectModal'));
+    modal.show();
+}
+</script>
+{% endblock %}

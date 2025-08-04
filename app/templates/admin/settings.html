@@ -1,0 +1,328 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="dashboard-card">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <h2 class="text-gradient mb-2">
+                            <i class="bi bi-gear"></i>
+                            إعدادات النظام
+                        </h2>
+                        <p class="text-muted mb-0">إدارة الإعدادات العامة والمالية للنظام</p>
+                    </div>
+                    <div class="col-md-4 text-end">
+                        <a href="{{ url_for('admin.dashboard') }}" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-right"></i> العودة للوحة التحكم
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- نموذج الإعدادات -->
+        <div class="col-lg-8">
+            <div class="card dashboard-card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-sliders"></i>
+                        الإعدادات العامة
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        {{ form.hidden_tag() }}
+                        
+                        <!-- إعدادات الشركة -->
+                        <div class="mb-4">
+                            <h6 class="text-muted border-bottom pb-2">معلومات الشركة</h6>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        {{ form.company_name.label(class="form-label fw-bold") }}
+                                        {{ form.company_name(class="form-control" + (" is-invalid" if form.company_name.errors else "")) }}
+                                        {% for error in form.company_name.errors %}
+                                            <div class="invalid-feedback">{{ error }}</div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        {{ form.admin_email.label(class="form-label fw-bold") }}
+                                        {{ form.admin_email(class="form-control" + (" is-invalid" if form.admin_email.errors else "")) }}
+                                        {% for error in form.admin_email.errors %}
+                                            <div class="invalid-feedback">{{ error }}</div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- الإعدادات المالية -->
+                        <div class="mb-4">
+                            <h6 class="text-muted border-bottom pb-2">الإعدادات المالية</h6>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        {{ form.message_price.label(class="form-label fw-bold") }}
+                                        <div class="input-group">
+                                            {{ form.message_price(class="form-control" + (" is-invalid" if form.message_price.errors else ""), step="0.01") }}
+                                            <span class="input-group-text">جنيه</span>
+                                        </div>
+                                        {% for error in form.message_price.errors %}
+                                            <div class="invalid-feedback">{{ error }}</div>
+                                        {% endfor %}
+                                        <div class="form-text">سعر الرسالة الواحدة للعملاء</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        {{ form.low_balance_threshold.label(class="form-label fw-bold") }}
+                                        <div class="input-group">
+                                            {{ form.low_balance_threshold(class="form-control" + (" is-invalid" if form.low_balance_threshold.errors else "")) }}
+                                            <span class="input-group-text">جنيه</span>
+                                        </div>
+                                        {% for error in form.low_balance_threshold.errors %}
+                                            <div class="invalid-feedback">{{ error }}</div>
+                                        {% endfor %}
+                                        <div class="form-text">حد التحذير من انخفاض الرصيد</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        {{ form.free_messages_limit.label(class="form-label fw-bold") }}
+                                        {{ form.free_messages_limit(class="form-control" + (" is-invalid" if form.free_messages_limit.errors else "")) }}
+                                        {% for error in form.free_messages_limit.errors %}
+                                            <div class="invalid-feedback">{{ error }}</div>
+                                        {% endfor %}
+                                        <div class="form-text">عدد الرسائل المجانية لكل عضو جديد</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        {{ form.transfer_phone.label(class="form-label fw-bold") }}
+                                        {{ form.transfer_phone(class="form-control" + (" is-invalid" if form.transfer_phone.errors else "")) }}
+                                        {% for error in form.transfer_phone.errors %}
+                                            <div class="invalid-feedback">{{ error }}</div>
+                                        {% endfor %}
+                                        <div class="form-text">رقم التليفون لتحويل الأموال</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <button type="button" class="btn btn-outline-warning" onclick="exportSettings()">
+                                <i class="bi bi-download"></i> تصدير الإعدادات
+                            </button>
+                            <button type="button" class="btn btn-outline-info" onclick="resetToDefaults()">
+                                <i class="bi bi-arrow-counterclockwise"></i> القيم الافتراضية
+                            </button>
+                            {{ form.submit(class="btn btn-success") }}
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- معلومات النظام -->
+        <div class="col-lg-4">
+            <!-- معلومات النظام -->
+            <div class="card dashboard-card mb-4">
+                <div class="card-header">
+                    <h6 class="mb-0">
+                        <i class="bi bi-info-circle"></i>
+                        معلومات النظام
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="list-group list-group-flush">
+                        <div class="list-group-item d-flex justify-content-between align-items-center border-0 px-0">
+                            <span>اسم النظام:</span>
+                            <strong class="text-primary">Verifix-OTP</strong>
+                        </div>
+                        <div class="list-group-item d-flex justify-content-between align-items-center border-0 px-0">
+                            <span>الإصدار:</span>
+                            <span class="badge bg-success">v1.0.0</span>
+                        </div>
+                        <div class="list-group-item d-flex justify-content-between align-items-center border-0 px-0">
+                            <span>البيئة:</span>
+                            <span class="badge bg-warning">التطوير</span>
+                        </div>
+                        <div class="list-group-item d-flex justify-content-between align-items-center border-0 px-0">
+                            <span>قاعدة البيانات:</span>
+                            <span class="badge bg-info">SQLite</span>
+                        </div>
+                        <div class="list-group-item d-flex justify-content-between align-items-center border-0 px-0">
+                            <span>آخر تحديث:</span>
+                            <small class="text-muted">2025-07-29</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- إحصائيات سريعة -->
+            <div class="card dashboard-card mb-4">
+                <div class="card-header">
+                    <h6 class="mb-0">
+                        <i class="bi bi-speedometer2"></i>
+                        إحصائيات سريعة
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-6 mb-3">
+                            <div class="border-end">
+                                <h4 class="text-primary mb-0">15</h4>
+                                <small class="text-muted">شركات نشطة</small>
+                            </div>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <h4 class="text-success mb-0">2,450</h4>
+                            <small class="text-muted">رسائل اليوم</small>
+                        </div>
+                        <div class="col-6">
+                            <div class="border-end">
+                                <h4 class="text-warning mb-0">850.5</h4>
+                                <small class="text-muted">إيرادات الشهر</small>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <h4 class="text-info mb-0">98%</h4>
+                            <small class="text-muted">معدل التوفر</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- عمليات إدارية -->
+            <div class="card dashboard-card">
+                <div class="card-header">
+                    <h6 class="mb-0">
+                        <i class="bi bi-tools"></i>
+                        عمليات إدارية
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <button class="btn btn-outline-primary btn-sm" onclick="clearCache()">
+                            <i class="bi bi-arrow-repeat"></i> مسح ذاكرة التخزين المؤقت
+                        </button>
+                        <button class="btn btn-outline-info btn-sm" onclick="backupDatabase()">
+                            <i class="bi bi-hdd"></i> نسخ احتياطي لقاعدة البيانات
+                        </button>
+                        <button class="btn btn-outline-warning btn-sm" onclick="optimizeDatabase()">
+                            <i class="bi bi-gear"></i> تحسين قاعدة البيانات
+                        </button>
+                        <button class="btn btn-outline-secondary btn-sm" onclick="viewLogs()">
+                            <i class="bi bi-file-text"></i> عرض سجلات النظام
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- تحذيرات مهمة -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="alert alert-warning">
+                <h6 class="alert-heading">
+                    <i class="bi bi-exclamation-triangle"></i> تحذيرات مهمة
+                </h6>
+                <ul class="mb-0">
+                    <li><strong>سعر الرسالة:</strong> تغيير سعر الرسالة سيؤثر على جميع الرسائل الجديدة</li>
+                    <li><strong>الرسائل المجانية:</strong> تغيير حد الرسائل المجانية سيطبق على المستخدمين الجدد فقط</li>
+                    <li><strong>رقم التحويل:</strong> تأكد من صحة رقم التليفون قبل الحفظ</li>
+                    <li><strong>النسخ الاحتياطي:</strong> يُنصح بعمل نسخة احتياطية قبل تغيير أي إعدادات مهمة</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function resetToDefaults() {
+    if (confirm('هل تريد إعادة تعيين جميع الإعدادات للقيم الافتراضية؟')) {
+        document.querySelector('input[name="company_name"]').value = 'Verifix-OTP';
+        document.querySelector('input[name="admin_email"]').value = 'admin@verifix-otp.com';
+        document.querySelector('input[name="message_price"]').value = '0.25';
+        document.querySelector('input[name="free_messages_limit"]').value = '1000';
+        document.querySelector('input[name="low_balance_threshold"]').value = '50';
+        document.querySelector('input[name="transfer_phone"]').value = '01033607749';
+    }
+}
+
+function exportSettings() {
+    const settings = {
+        company_name: document.querySelector('input[name="company_name"]').value,
+        admin_email: document.querySelector('input[name="admin_email"]').value,
+        message_price: document.querySelector('input[name="message_price"]').value,
+        free_messages_limit: document.querySelector('input[name="free_messages_limit"]').value,
+        low_balance_threshold: document.querySelector('input[name="low_balance_threshold"]').value,
+        transfer_phone: document.querySelector('input[name="transfer_phone"]').value,
+        export_date: new Date().toISOString()
+    };
+    
+    const dataStr = JSON.stringify(settings, null, 2);
+    const dataBlob = new Blob([dataStr], {type: 'application/json'});
+    const url = URL.createObjectURL(dataBlob);
+    
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'verifix-settings-' + new Date().toISOString().split('T')[0] + '.json';
+    link.click();
+}
+
+function clearCache() {
+    if (confirm('هل تريد مسح ذاكرة التخزين المؤقت؟')) {
+        fetch('/admin/clear-cache', {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': document.querySelector('input[name="csrf_token"]').value
+            }
+        }).then(response => {
+            if (response.ok) {
+                alert('تم مسح ذاكرة التخزين المؤقت بنجاح');
+            } else {
+                alert('حدث خطأ أثناء مسح ذاكرة التخزين');
+            }
+        });
+    }
+}
+
+function backupDatabase() {
+    if (confirm('هل تريد إنشاء نسخة احتياطية من قاعدة البيانات؟')) {
+        window.location.href = '/admin/backup-database';
+    }
+}
+
+function optimizeDatabase() {
+    if (confirm('هل تريد تحسين قاعدة البيانات؟ قد يستغرق هذا بعض الوقت.')) {
+        fetch('/admin/optimize-database', {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': document.querySelector('input[name="csrf_token"]').value
+            }
+        }).then(response => {
+            if (response.ok) {
+                alert('تم تحسين قاعدة البيانات بنجاح');
+            } else {
+                alert('حدث خطأ أثناء تحسين قاعدة البيانات');
+            }
+        });
+    }
+}
+
+function viewLogs() {
+    window.open('/admin/system-logs', '_blank');
+}
+</script>
+{% endblock %}

@@ -1,0 +1,163 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="dashboard-card">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <h2 class="text-gradient mb-2">
+                            <i class="bi bi-envelope-paper"></i>
+                            إدارة قوالب البريد الإلكتروني
+                        </h2>
+                        <p class="text-muted mb-0">إدارة وتخصيص قوالب الرسائل الافتراضية للنظام</p>
+                    </div>
+                    <div class="col-md-4 text-end">
+                        <a href="{{ url_for('admin.dashboard') }}" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-right"></i> العودة للوحة التحكم
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- القوالب المتاحة -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card dashboard-card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-file-earmark-text"></i>
+                        قوالب البريد الأساسية
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if templates %}
+                        <div class="row">
+                            {% for template in templates %}
+                            <div class="col-md-6 col-lg-4 mb-4">
+                                <div class="card h-100 border-0 shadow-sm">
+                                    <div class="card-header" style="background: linear-gradient(135deg, {{ template.primary_color }}22 0%, {{ template.secondary_color }}22 100%);">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <h6 class="mb-0 fw-bold">{{ template.template_name }}</h6>
+                                            {% if template.is_active %}
+                                                <span class="badge bg-success">نشط</span>
+                                            {% else %}
+                                                <span class="badge bg-secondary">معطل</span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <div class="card-body">
+                                        <p class="text-muted mb-2">
+                                            <strong>النوع:</strong> {{ template.template_type }}
+                                        </p>
+                                        <p class="text-muted mb-2">
+                                            <strong>العنوان:</strong> {{ template.subject[:50] }}
+                                            {% if template.subject|length > 50 %}...{% endif %}
+                                        </p>
+                                        <div class="mb-3">
+                                            <small class="text-muted">الألوان:</small>
+                                            <div class="d-flex gap-2 mt-1">
+                                                <div class="color-preview" style="background-color: {{ template.primary_color }};" title="اللون الأساسي"></div>
+                                                <div class="color-preview" style="background-color: {{ template.secondary_color }};" title="اللون الثانوي"></div>
+                                            </div>
+                                        </div>
+                                        <div class="d-grid">
+                                            <a href="{{ url_for('admin.email_template_edit', id=template.id) }}" 
+                                               class="btn btn-primary btn-sm">
+                                                <i class="bi bi-pencil"></i> تعديل القالب
+                                            </a>
+                                        </div>
+                                    </div>
+                                    <div class="card-footer bg-transparent">
+                                        <small class="text-muted">
+                                            <i class="bi bi-clock"></i>
+                                            آخر تحديث: {{ template.updated_at.strftime('%Y-%m-%d') }}
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="text-center py-5">
+                            <i class="bi bi-file-earmark-plus text-muted" style="font-size: 4rem;"></i>
+                            <h4 class="text-muted mt-3">لا توجد قوالب بعد</h4>
+                            <p class="text-muted">لم يتم إنشاء أي قوالب للبريد الإلكتروني بعد.</p>
+                            <button class="btn btn-primary" onclick="initializeDefaultTemplates()">
+                                <i class="bi bi-plus-circle"></i> إنشاء القوالب الافتراضية
+                            </button>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- معلومات إضافية -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="alert alert-info">
+                <h6 class="alert-heading">
+                    <i class="bi bi-info-circle"></i> معلومات مهمة حول قوالب البريد
+                </h6>
+                <ul class="mb-0">
+                    <li><strong>قالب التحقق:</strong> يُستخدم لإرسال كود التحقق للمستخدمين الجدد</li>
+                    <li><strong>قالب الترحيب:</strong> يُرسل بعد تفعيل الحساب بنجاح</li>
+                    <li><strong>المتغيرات المتاحة:</strong> 
+                        <code>{{company_name}}</code>, 
+                        <code>{{site_name}}</code>, 
+                        <code>{{verification_code}}</code>, 
+                        <code>{{current_year}}</code>
+                    </li>
+                    <li><strong>ألوان النظام:</strong> الأخضر الفاتح (#28a745) والأبيض (#ffffff)</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.color-preview {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 2px solid #dee2e6;
+    display: inline-block;
+}
+
+.template-preview {
+    max-height: 200px;
+    overflow: hidden;
+    border: 1px solid #dee2e6;
+    border-radius: 5px;
+    background-color: #f8f9fa;
+}
+</style>
+
+<script>
+function initializeDefaultTemplates() {
+    if (confirm('هل تريد إنشاء القوالب الافتراضية للنظام؟')) {
+        // يمكن إضافة استدعاء AJAX هنا لإنشاء القوالب
+        fetch('/admin/initialize-templates', {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': document.querySelector('input[name="csrf_token"]').value
+            }
+        }).then(response => {
+            if (response.ok) {
+                location.reload();
+            } else {
+                alert('حدث خطأ أثناء إنشاء القوالب');
+            }
+        }).catch(error => {
+            console.error('Error:', error);
+            alert('حدث خطأ أثناء إنشاء القوالب');
+        });
+    }
+}
+</script>
+{% endblock %}

@@ -1,5 +1,6 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, BooleanField, IntegerField
+from flask_wtf.file import FileField, FileAllowed
+from wtforms import StringField, PasswordField, SubmitField, BooleanField, IntegerField, FloatField, TextAreaField
 from wtforms.validators import DataRequired, Email, EqualTo, Length, NumberRange, ValidationError
 from wtforms.widgets import PasswordInput
 from app.models import Company
@@ -43,3 +44,18 @@ class ChangePasswordForm(FlaskForm):
     new_password2 = PasswordField('تأكيد كلمة المرور الجديدة', 
                                   validators=[DataRequired(), EqualTo('new_password')])
     submit = SubmitField('تغيير كلمة المرور')
+
+
+class VerificationForm(FlaskForm):
+    """نموذج إدخال كود التحقق"""
+    verification_code = StringField('كود التحقق', validators=[DataRequired(), Length(min=6, max=6)])
+    submit = SubmitField('تحقق')
+
+
+class BalanceRequestForm(FlaskForm):
+    """نموذج طلب شحن الرصيد"""
+    amount = FloatField('مبلغ الشحن المطلوب', validators=[DataRequired(), NumberRange(min=10, max=10000)])
+    transfer_receipt = FileField('صورة إيصال التحويل', 
+                                validators=[DataRequired(), FileAllowed(['jpg', 'jpeg', 'png'], 'الصور فقط!')])
+    transfer_number = StringField('رقم العملية (اختياري)', validators=[Length(max=20)])
+    submit = SubmitField('إرسال الطلب')

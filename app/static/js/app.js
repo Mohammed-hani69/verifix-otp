@@ -68,9 +68,14 @@ function copyToClipboard(text, button = null) {
 function updateBalance() {
     if (!document.querySelector('[data-balance]')) return;
     
+    const apiKeyElement = document.querySelector('[data-api-key]');
+    if (!apiKeyElement) return;
+    
     fetch('/api/balance', {
+        method: 'GET',
         headers: {
-            'X-API-Key': document.querySelector('[data-api-key]')?.dataset.apiKey
+            'Content-Type': 'application/json',
+            'X-API-Key': apiKeyElement.dataset.apiKey
         }
     })
     .then(response => response.json())
@@ -149,8 +154,8 @@ function sendTestEmail() {
     const testEmail = prompt('أدخل البريد الإلكتروني لإرسال رسالة اختبار:');
     if (!testEmail) return;
     
-    const apiKey = document.querySelector('[data-api-key]')?.dataset.apiKey;
-    if (!apiKey) {
+    const apiKeyElement = document.querySelector('[data-api-key]');
+    if (!apiKeyElement) {
         showMessage('مفتاح API غير متوفر', 'error');
         return;
     }
@@ -162,7 +167,7 @@ function sendTestEmail() {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'X-API-Key': apiKey
+            'X-API-Key': apiKeyElement.dataset.apiKey
         },
         body: JSON.stringify({
             email: testEmail

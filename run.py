@@ -83,6 +83,13 @@ def create_admin():
     print(f"🔑 API Key: {admin.api_key}")
 
 if __name__ == '__main__':
+    print("🚀 بدء تشغيل نظام Verifix-OTP...")
+    print("🌐 الرابط: http://localhost:5000")
+    print("👤 حساب المدير:")
+    print("   📧 البريد: admin@verifix-otp.com")
+    print("   🔑 كلمة المرور: zxc65432")
+    print("=" * 50)
+    
     # إعدادات الإنتاج
     import os
     port = int(os.environ.get('PORT', 5000))

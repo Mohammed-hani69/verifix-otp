@@ -1,10 +1,14 @@
 from flask import render_template, redirect, url_for, flash, request, current_app
 from flask_login import login_user, logout_user, login_required, current_user
 from datetime import datetime
+import os
+from werkzeug.utils import secure_filename
+
 from app.auth import bp
-from app.auth.forms import LoginForm, RegistrationForm, EmailSettingsForm, ChangePasswordForm
-from app.models import Company, EmailService, CompanyService
+from app.auth.forms import LoginForm, RegistrationForm, EmailSettingsForm, ChangePasswordForm, VerificationForm, BalanceRequestForm
+from app.models import Company, EmailService, CompanyService, BalanceRequest
 from app import db
+from app.utils.email_utils import send_verification_email, send_welcome_email
 
 @bp.route('/login', methods=['GET', 'POST'])
 def login():
@@ -21,6 +25,10 @@ def login():
                 flash('تم إيقاف حسابك. يرجى التواصل مع الإدارة.', 'error')
                 return redirect(url_for('auth.login'))
             
+            if not company.is_verified:
+                flash('يجب تفعيل حسابك أولاً. تحقق من بريدك الإلكتروني.', 'warning')
+                return redirect(url_for('auth.verify_email', email=company.email))
+            
             login_user(company, remember=form.remember_me.data)
             company.last_login = datetime.utcnow()
             db.session.commit()
@@ -30,7 +38,10 @@ def login():
             # إعادة توجيه إلى الصفحة المطلوبة
             next_page = request.args.get('next')
             if not next_page or not next_page.startswith('/'):
-                next_page = url_for('dashboard.index')
+                if company.is_admin:
+                    next_page = url_for('admin.dashboard')
+                else:
+                    next_page = url_for('dashboard.index')
             return redirect(next_page)
         else:
             flash('بيانات الدخول غير صحيحة.', 'error')
@@ -54,6 +65,21 @@ def register():
         db.session.add(company)
         db.session.commit()
         
+        # إنشاء كود التحقق وإرساله
+        verification_code = company.generate_verification_code()
+        db.session.commit()
+        
+        # إرسال رسالة التحقق
+        try:
+            success, message = send_verification_email(company.email, verification_code, company.company_name)
+            if not success:
+                print(f"فشل إرسال رسالة التحقق: {message}")
+                # لا نوقف العملية، فقط نسجل الخطأ
+        except Exception as e:
+            print(f"خطأ في إرسال رسالة التحقق: {e}")
+            import traceback
+            traceback.print_exc()
+        
         # إضافة الخدمات الأساسية للشركة الجديدة
         basic_services = EmailService.query.filter_by(is_active=True).all()
         for service in basic_services:
@@ -65,8 +91,8 @@ def register():
         
         db.session.commit()
         
-        flash('تم إنشاء حسابك بنجاح! يمكنك الآن تسجيل الدخول.', 'success')
-        return redirect(url_for('auth.login'))
+        flash('تم إنشاء حسابك بنجاح! تحقق من بريدك الإلكتروني لتفعيل الحساب.', 'success')
+        return redirect(url_for('auth.verify_email', email=company.email))
     
     return render_template('auth/register.html', title='إنشاء حساب', form=form)
 
@@ -131,3 +157,97 @@ def regenerate_api_key():
     new_api_key = current_user.regenerate_api_key()
     flash(f'تم إنشاء مفتاح API جديد: {new_api_key}', 'success')
     return redirect(url_for('dashboard.api_settings'))
+
+
+@bp.route('/verify-email/<email>', methods=['GET', 'POST'])
+def verify_email(email):
+    """صفحة إدخال كود التحقق"""
+    company = Company.query.filter_by(email=email).first_or_404()
+    
+    if company.is_verified:
+        flash('تم تفعيل حسابك بالفعل.', 'info')
+        return redirect(url_for('auth.login'))
+    
+    form = VerificationForm()
+    
+    if form.validate_on_submit():
+        # التحقق من كود التفعيل
+        if company.verify_code(form.verification_code.data):
+            db.session.commit()
+            
+            # إرسال رسالة ترحيبية
+            try:
+                send_welcome_email(company.email, company.company_name)
+            except Exception as e:
+                print(f"خطأ في إرسال رسالة الترحيب: {e}")
+            
+            flash('تم تفعيل حسابك بنجاح! مرحباً بك في Verifix-OTP', 'success')
+            login_user(company)
+            return redirect(url_for('dashboard.index'))
+        else:
+            flash('كود التحقق غير صحيح أو منتهي الصلاحية.', 'error')
+    
+    return render_template('auth/verify_email.html', 
+                         title='تفعيل الحساب', 
+                         form=form, 
+                         email=email)
+
+
+@bp.route('/resend-verification/<email>')
+def resend_verification(email):
+    """إعادة إرسال كود التحقق"""
+    company = Company.query.filter_by(email=email).first_or_404()
+    
+    if company.is_verified:
+        flash('تم تفعيل حسابك بالفعل.', 'info')
+        return redirect(url_for('auth.login'))
+    
+    # إنشاء كود جديد
+    verification_code = company.generate_verification_code()
+    db.session.commit()
+    
+    try:
+        send_verification_email(company.email, verification_code, company.company_name)
+        flash('تم إرسال كود التحقق الجديد إلى بريدك الإلكتروني.', 'success')
+    except Exception as e:
+        flash('حدث خطأ في إرسال كود التحقق. حاول مرة أخرى.', 'error')
+        print(f"خطأ في إرسال رسالة التحقق: {e}")
+    
+    return redirect(url_for('auth.verify_email', email=email))
+
+
+@bp.route('/balance-request', methods=['GET', 'POST'])
+@login_required
+def balance_request():
+    """طلب شحن الرصيد"""
+    form = BalanceRequestForm()
+    
+    if form.validate_on_submit():
+        # حفظ صورة إيصال التحويل
+        file = form.transfer_receipt.data
+        filename = secure_filename(file.filename)
+        
+        # إنشاء مسار الحفظ الكامل
+        upload_folder = os.path.join(current_app.instance_path, current_app.config['UPLOAD_FOLDER'], 'receipts')
+        os.makedirs(upload_folder, exist_ok=True)
+        
+        file_path = os.path.join(upload_folder, filename)
+        file.save(file_path)
+        
+        # إنشاء طلب الشحن
+        balance_request = BalanceRequest(
+            company_id=current_user.id,
+            amount=form.amount.data,
+            transfer_receipt=f'receipts/{filename}',
+            transfer_number=form.transfer_number.data
+        )
+        
+        db.session.add(balance_request)
+        db.session.commit()
+        
+        flash('تم إرسال طلب شحن الرصيد بنجاح! سيتم مراجعته خلال 24 ساعة.', 'success')
+        return redirect(url_for('dashboard.balance'))
+    
+    return render_template('auth/balance_request.html', 
+                         title='طلب شحن الرصيد', 
+                         form=form)

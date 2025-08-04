@@ -1,0 +1,287 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="dashboard-card">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <h2 class="text-gradient mb-2">
+                            <i class="bi bi-pencil-square"></i>
+                            تعديل بيانات الشركة: {{ company.company_name }}
+                        </h2>
+                        <p class="text-muted mb-0">تعديل وإدارة بيانات الشركة والصلاحيات</p>
+                    </div>
+                    <div class="col-md-4 text-end">
+                        <a href="{{ url_for('admin.companies') }}" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-right"></i> العودة للشركات
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- نموذج التعديل -->
+        <div class="col-lg-8">
+            <div class="card dashboard-card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-gear"></i>
+                        بيانات الشركة الأساسية
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        {{ form.hidden_tag() }}
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    {{ form.company_name.label(class="form-label fw-bold") }}
+                                    {{ form.company_name(class="form-control" + (" is-invalid" if form.company_name.errors else "")) }}
+                                    {% for error in form.company_name.errors %}
+                                        <div class="invalid-feedback">{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    {{ form.email.label(class="form-label fw-bold") }}
+                                    {{ form.email(class="form-control" + (" is-invalid" if form.email.errors else "")) }}
+                                    {% for error in form.email.errors %}
+                                        <div class="invalid-feedback">{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    {{ form.balance.label(class="form-label fw-bold") }}
+                                    <div class="input-group">
+                                        {{ form.balance(class="form-control" + (" is-invalid" if form.balance.errors else ""), step="0.01") }}
+                                        <span class="input-group-text">جنيه</span>
+                                    </div>
+                                    {% for error in form.balance.errors %}
+                                        <div class="invalid-feedback">{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    {{ form.free_messages_used.label(class="form-label fw-bold") }}
+                                    {{ form.free_messages_used(class="form-control" + (" is-invalid" if form.free_messages_used.errors else "")) }}
+                                    {% for error in form.free_messages_used.errors %}
+                                        <div class="invalid-feedback">{{ error }}</div>
+                                    {% endfor %}
+                                    <div class="form-text">من أصل 1000 رسالة مجانية</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <div class="form-check">
+                                        {{ form.is_active(class="form-check-input") }}
+                                        {{ form.is_active.label(class="form-check-label") }}
+                                    </div>
+                                    <div class="form-text">تحديد ما إذا كانت الشركة يمكنها استخدام النظام أم لا</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <div class="form-check">
+                                        {{ form.is_admin(class="form-check-input") }}
+                                        {{ form.is_admin.label(class="form-check-label") }}
+                                    </div>
+                                    <div class="form-text">منح صلاحيات إدارية للشركة</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            {{ form.notes.label(class="form-label fw-bold") }}
+                            {{ form.notes(class="form-control" + (" is-invalid" if form.notes.errors else ""), rows="4") }}
+                            {% for error in form.notes.errors %}
+                                <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                            <div class="form-text">ملاحظات إدارية حول الشركة (لن تظهر للشركة)</div>
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <button type="button" class="btn btn-outline-danger" onclick="resetPassword()">
+                                <i class="bi bi-key"></i> إعادة تعيين كلمة المرور
+                            </button>
+                            {{ form.submit(class="btn btn-success") }}
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- معلومات إضافية -->
+        <div class="col-lg-4">
+            <!-- ملخص الحساب -->
+            <div class="card dashboard-card mb-4">
+                <div class="card-header">
+                    <h6 class="mb-0">
+                        <i class="bi bi-info-circle"></i>
+                        ملخص الحساب
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-6 mb-3">
+                            <div class="border-end">
+                                <h4 class="text-primary mb-0">{{ company.total_messages_sent }}</h4>
+                                <small class="text-muted">إجمالي الرسائل</small>
+                            </div>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <h4 class="text-success mb-0">{{ "%.2f"|format(company.balance) }}</h4>
+                            <small class="text-muted">الرصيد الحالي</small>
+                        </div>
+                        <div class="col-6">
+                            <div class="border-end">
+                                <h4 class="text-warning mb-0">{{ company.free_messages_used }}</h4>
+                                <small class="text-muted">رسائل مجانية مستخدمة</small>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <h4 class="text-info mb-0">{{ 1000 - company.free_messages_used }}</h4>
+                            <small class="text-muted">رسائل مجانية متبقية</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- حالة الحساب -->
+            <div class="card dashboard-card mb-4">
+                <div class="card-header">
+                    <h6 class="mb-0">
+                        <i class="bi bi-shield-check"></i>
+                        حالة الحساب
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="list-group list-group-flush">
+                        <div class="list-group-item d-flex justify-content-between align-items-center border-0 px-0">
+                            <span>حالة التفعيل:</span>
+                            {% if company.is_active %}
+                                <span class="badge bg-success">مفعل</span>
+                            {% else %}
+                                <span class="badge bg-danger">معطل</span>
+                            {% endif %}
+                        </div>
+                        <div class="list-group-item d-flex justify-content-between align-items-center border-0 px-0">
+                            <span>التحقق:</span>
+                            {% if company.is_verified %}
+                                <span class="badge bg-success">تم التحقق</span>
+                            {% else %}
+                                <span class="badge bg-warning">لم يتم التحقق</span>
+                            {% endif %}
+                        </div>
+                        <div class="list-group-item d-flex justify-content-between align-items-center border-0 px-0">
+                            <span>نوع الحساب:</span>
+                            {% if company.is_admin %}
+                                <span class="badge bg-primary">إداري</span>
+                            {% else %}
+                                <span class="badge bg-secondary">عادي</span>
+                            {% endif %}
+                        </div>
+                        <div class="list-group-item d-flex justify-content-between align-items-center border-0 px-0">
+                            <span>تاريخ التسجيل:</span>
+                            <small class="text-muted">{{ company.created_at.strftime('%Y-%m-%d') }}</small>
+                        </div>
+                        <div class="list-group-item d-flex justify-content-between align-items-center border-0 px-0">
+                            <span>آخر دخول:</span>
+                            <small class="text-muted">
+                                {% if company.last_login %}
+                                    {{ company.last_login.strftime('%Y-%m-%d %H:%M') }}
+                                {% else %}
+                                    لم يسجل دخول بعد
+                                {% endif %}
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- مفتاح API -->
+            <div class="card dashboard-card">
+                <div class="card-header">
+                    <h6 class="mb-0">
+                        <i class="bi bi-key"></i>
+                        مفتاح API
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="input-group">
+                        <input type="text" class="form-control" value="{{ company.api_key }}" readonly>
+                        <button class="btn btn-outline-secondary" type="button" onclick="copyApiKey()">
+                            <i class="bi bi-clipboard"></i>
+                        </button>
+                    </div>
+                    <div class="mt-2">
+                        <button class="btn btn-warning btn-sm w-100" onclick="regenerateApiKey()">
+                            <i class="bi bi-arrow-repeat"></i> إعادة إنتاج المفتاح
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function copyApiKey() {
+    const apiKeyInput = document.querySelector('input[value="{{ company.api_key }}"]');
+    apiKeyInput.select();
+    apiKeyInput.setSelectionRange(0, 99999);
+    document.execCommand('copy');
+    
+    alert('تم نسخ مفتاح API!');
+}
+
+function regenerateApiKey() {
+    if (confirm('هل تريد إعادة إنتاج مفتاح API؟ سيتوجب على الشركة تحديث المفتاح في تطبيقاتها.')) {
+        fetch(`/admin/company/{{ company.id }}/regenerate-api-key`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': document.querySelector('input[name="csrf_token"]').value
+            }
+        }).then(response => {
+            if (response.ok) {
+                alert('تم إعادة إنتاج مفتاح API بنجاح!');
+                location.reload();
+            } else {
+                alert('حدث خطأ أثناء إعادة إنتاج المفتاح');
+            }
+        });
+    }
+}
+
+function resetPassword() {
+    if (confirm('هل تريد إعادة تعيين كلمة مرور هذه الشركة؟ سيتم إرسال كلمة مرور مؤقتة عبر البريد الإلكتروني.')) {
+        fetch(`/admin/company/{{ company.id }}/reset-password`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': document.querySelector('input[name="csrf_token"]').value
+            }
+        }).then(response => {
+            if (response.ok) {
+                alert('تم إرسال كلمة المرور الجديدة إلى بريد الشركة الإلكتروني');
+            } else {
+                alert('حدث خطأ أثناء إعادة تعيين كلمة المرور');
+            }
+        });
+    }
+}
+</script>
+{% endblock %}

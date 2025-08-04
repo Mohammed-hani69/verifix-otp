@@ -1,0 +1,293 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="dashboard-card">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <h1 class="text-gradient mb-2">
+                            <i class="bi bi-shield-check"></i>
+                            لوحة التحكم الإدارية
+                        </h1>
+                        <p class="text-muted mb-0">إدارة شاملة لنظام Verifix-OTP</p>
+                    </div>
+                    <div class="col-md-4 text-end">
+                        <div class="d-flex justify-content-end gap-2">
+                            <a href="{{ url_for('admin.settings') }}" class="btn btn-outline-secondary">
+                                <i class="bi bi-gear"></i> الإعدادات
+                            </a>
+                            <a href="{{ url_for('admin.stats') }}" class="btn btn-outline-info">
+                                <i class="bi bi-graph-up"></i> التقارير
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- الإحصائيات السريعة -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card dashboard-card stats-card">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="stats-icon bg-primary">
+                            <i class="bi bi-building"></i>
+                        </div>
+                        <div class="ms-3">
+                            <h3 class="mb-0">{{ total_companies }}</h3>
+                            <p class="text-muted mb-0">إجمالي الشركات</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card dashboard-card stats-card">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="stats-icon bg-success">
+                            <i class="bi bi-check-circle"></i>
+                        </div>
+                        <div class="ms-3">
+                            <h3 class="mb-0">{{ active_companies }}</h3>
+                            <p class="text-muted mb-0">الشركات النشطة</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card dashboard-card stats-card">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="stats-icon bg-warning">
+                            <i class="bi bi-clock-history"></i>
+                        </div>
+                        <div class="ms-3">
+                            <h3 class="mb-0">{{ pending_requests }}</h3>
+                            <p class="text-muted mb-0">طلبات الشحن المعلقة</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card dashboard-card stats-card">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="stats-icon bg-info">
+                            <i class="bi bi-envelope"></i>
+                        </div>
+                        <div class="ms-3">
+                            <h3 class="mb-0">
+                                {% if today_stats %}
+                                    {{ today_stats.total_messages_sent }}
+                                {% else %}
+                                    0
+                                {% endif %}
+                            </h3>
+                            <p class="text-muted mb-0">رسائل اليوم</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- الإجراءات السريعة -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card dashboard-card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-lightning"></i>
+                        الإجراءات السريعة
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-2">
+                            <a href="{{ url_for('admin.companies') }}" class="btn btn-outline-primary w-100 mb-2">
+                                <i class="bi bi-building"></i><br>
+                                <small>إدارة الشركات</small>
+                            </a>
+                        </div>
+                        <div class="col-md-2">
+                            <a href="{{ url_for('admin.balance_requests') }}" class="btn btn-outline-warning w-100 mb-2">
+                                <i class="bi bi-credit-card"></i><br>
+                                <small>طلبات الشحن</small>
+                            </a>
+                        </div>
+                        <div class="col-md-2">
+                            <a href="{{ url_for('admin.email_templates') }}" class="btn btn-outline-info w-100 mb-2">
+                                <i class="bi bi-envelope-paper"></i><br>
+                                <small>قوالب البريد</small>
+                            </a>
+                        </div>
+                        <div class="col-md-2">
+                            <a href="{{ url_for('admin.stats') }}" class="btn btn-outline-success w-100 mb-2">
+                                <i class="bi bi-graph-up"></i><br>
+                                <small>التقارير</small>
+                            </a>
+                        </div>
+                        <div class="col-md-2">
+                            <a href="{{ url_for('admin.settings') }}" class="btn btn-outline-secondary w-100 mb-2">
+                                <i class="bi bi-gear"></i><br>
+                                <small>الإعدادات</small>
+                            </a>
+                        </div>
+                        <div class="col-md-2">
+                            <a href="{{ url_for('dashboard.logs') }}" class="btn btn-outline-dark w-100 mb-2">
+                                <i class="bi bi-list-ul"></i><br>
+                                <small>سجل الرسائل</small>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- آخر الطلبات والأنشطة -->
+    <div class="row">
+        <!-- طلبات الشحن الحديثة -->
+        <div class="col-lg-6">
+            <div class="card dashboard-card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="bi bi-credit-card"></i>
+                        آخر طلبات الشحن
+                    </h5>
+                    <a href="{{ url_for('admin.balance_requests') }}" class="btn btn-sm btn-outline-primary">
+                        عرض الكل
+                    </a>
+                </div>
+                <div class="card-body">
+                    {% if recent_requests %}
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>الشركة</th>
+                                        <th>المبلغ</th>
+                                        <th>الحالة</th>
+                                        <th>التاريخ</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for request in recent_requests %}
+                                    <tr>
+                                        <td>{{ request.company.company_name }}</td>
+                                        <td>{{ "%.2f"|format(request.amount) }} ج</td>
+                                        <td>
+                                            {% if request.status == 'pending' %}
+                                                <span class="badge bg-warning">معلق</span>
+                                            {% elif request.status == 'approved' %}
+                                                <span class="badge bg-success">مقبول</span>
+                                            {% else %}
+                                                <span class="badge bg-danger">مرفوض</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ request.created_at.strftime('%m-%d') }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="text-center text-muted py-3">
+                            <i class="bi bi-inbox"></i>
+                            <p class="mb-0">لا توجد طلبات شحن حديثة</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- الشركات الجديدة -->
+        <div class="col-lg-6">
+            <div class="card dashboard-card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="bi bi-building"></i>
+                        الشركات الجديدة
+                    </h5>
+                    <a href="{{ url_for('admin.companies') }}" class="btn btn-sm btn-outline-primary">
+                        عرض الكل
+                    </a>
+                </div>
+                <div class="card-body">
+                    {% if recent_companies %}
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>اسم الشركة</th>
+                                        <th>البريد</th>
+                                        <th>الحالة</th>
+                                        <th>التاريخ</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for company in recent_companies %}
+                                    <tr>
+                                        <td>{{ company.company_name }}</td>
+                                        <td>{{ company.email }}</td>
+                                        <td>
+                                            {% if company.is_verified %}
+                                                <span class="badge bg-success">مفعل</span>
+                                            {% else %}
+                                                <span class="badge bg-warning">غير مفعل</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ company.created_at.strftime('%m-%d') }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="text-center text-muted py-3">
+                            <i class="bi bi-inbox"></i>
+                            <p class="mb-0">لا توجد شركات جديدة</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.stats-card {
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    transition: transform 0.15s ease-in-out;
+}
+
+.stats-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+.stats-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.25rem;
+}
+</style>
+{% endblock %}

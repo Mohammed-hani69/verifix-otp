@@ -1,0 +1,196 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="dashboard-card">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <h2 class="text-gradient mb-2">
+                            <i class="bi bi-credit-card"></i>
+                            طلب شحن الرصيد
+                        </h2>
+                        <p class="text-muted mb-0">قم بشحن رصيدك للاستمرار في إرسال الرسائل</p>
+                    </div>
+                    <div class="col-md-4 text-end">
+                        <a href="{{ url_for('dashboard.balance') }}" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-right"></i> العودة لإدارة الرصيد
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- معلومات التحويل -->
+            <div class="card dashboard-card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="bi bi-info-circle"></i>
+                        معلومات التحويل
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <h6 class="alert-heading">خطوات شحن الرصيد:</h6>
+                        <ol class="mb-0">
+                            <li>قم بتحويل المبلغ المطلوب إلى الرقم: <strong class="text-primary">01033607749</strong></li>
+                            <li>احتفظ بصورة من إيصال التحويل</li>
+                            <li>املأ النموذج أدناه وارفق صورة الإيصال</li>
+                            <li>سيتم مراجعة طلبك خلال 24 ساعة</li>
+                        </ol>
+                    </div>
+
+                    <div class="transfer-info text-center p-4 bg-light rounded">
+                        <h4 class="text-primary mb-3">
+                            <i class="bi bi-telephone"></i>
+                            رقم التحويل
+                        </h4>
+                        <h2 class="text-success mb-2">01033607749</h2>
+                        <p class="text-muted mb-0">Verifix-OTP - خدمات البريد الإلكتروني</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- نموذج طلب الشحن -->
+            <div class="card dashboard-card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-upload"></i>
+                        تفاصيل الطلب
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST" enctype="multipart/form-data">
+                        {{ form.hidden_tag() }}
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    {{ form.amount.label(class="form-label fw-bold") }}
+                                    <div class="input-group">
+                                        {{ form.amount(class="form-control" + (" is-invalid" if form.amount.errors else ""), placeholder="100") }}
+                                        <span class="input-group-text">جنيه</span>
+                                    </div>
+                                    {% for error in form.amount.errors %}
+                                        <div class="invalid-feedback d-block">{{ error }}</div>
+                                    {% endfor %}
+                                    <div class="form-text">الحد الأدنى للشحن: 10 جنيه</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    {{ form.transfer_number.label(class="form-label fw-bold") }}
+                                    {{ form.transfer_number(class="form-control" + (" is-invalid" if form.transfer_number.errors else ""), placeholder="رقم العملية من الإيصال") }}
+                                    {% for error in form.transfer_number.errors %}
+                                        <div class="invalid-feedback">{{ error }}</div>
+                                    {% endfor %}
+                                    <div class="form-text">اختياري - يساعد في تسريع المراجعة</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            {{ form.transfer_receipt.label(class="form-label fw-bold") }}
+                            {{ form.transfer_receipt(class="form-control" + (" is-invalid" if form.transfer_receipt.errors else ""), accept="image/*") }}
+                            {% for error in form.transfer_receipt.errors %}
+                                <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                            <div class="form-text">يُسمح بالصور فقط (JPG, PNG) - الحد الأقصى: 5MB</div>
+                        </div>
+
+                        <!-- معاينة الصورة -->
+                        <div id="image-preview" class="mb-3" style="display: none;">
+                            <label class="form-label fw-bold">معاينة الصورة:</label>
+                            <div class="border rounded p-2 text-center">
+                                <img id="preview-img" src="" alt="معاينة الإيصال" class="img-fluid" style="max-height: 300px;">
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="{{ url_for('dashboard.balance') }}" class="btn btn-outline-secondary">
+                                <i class="bi bi-x-circle"></i> إلغاء
+                            </a>
+                            {{ form.submit(class="btn btn-success") }}
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- طلبات سابقة -->
+            {% if current_user.balance_requests.count() > 0 %}
+            <div class="card dashboard-card mt-4">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-clock-history"></i>
+                        طلباتك السابقة
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>المبلغ</th>
+                                    <th>تاريخ الطلب</th>
+                                    <th>الحالة</th>
+                                    <th>الإجراءات</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for request in current_user.balance_requests.order_by('created_at desc').limit(5) %}
+                                <tr>
+                                    <td>
+                                        <strong>{{ "%.2f"|format(request.amount) }} جنيه</strong>
+                                    </td>
+                                    <td>{{ request.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                                    <td>
+                                        {% if request.status == 'pending' %}
+                                            <span class="badge bg-warning">في الانتظار</span>
+                                        {% elif request.status == 'approved' %}
+                                            <span class="badge bg-success">تمت الموافقة</span>
+                                        {% else %}
+                                            <span class="badge bg-danger">مرفوض</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if request.transfer_receipt %}
+                                            <a href="{{ url_for('static', filename='uploads/' + request.transfer_receipt) }}" 
+                                               target="_blank" class="btn btn-sm btn-outline-primary">
+                                                <i class="bi bi-image"></i> الإيصال
+                                            </a>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+// معاينة الصورة
+document.getElementById('transfer_receipt').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            document.getElementById('preview-img').src = e.target.result;
+            document.getElementById('image-preview').style.display = 'block';
+        };
+        reader.readAsDataURL(file);
+    } else {
+        document.getElementById('image-preview').style.display = 'none';
+    }
+});
+</script>
+{% endblock %}

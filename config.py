@@ -15,8 +15,8 @@ class Config:
     MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
     
     # إعدادات الشركة
-    COMPANY_NAME = os.environ.get('COMPANY_NAME') or 'Email Sender Pro'
-    ADMIN_EMAIL = os.environ.get('ADMIN_EMAIL') or 'admin@emailsender.com'
+    COMPANY_NAME = os.environ.get('COMPANY_NAME') or 'Verifix-OTP'
+    ADMIN_EMAIL = os.environ.get('ADMIN_EMAIL') or 'admin@verifix-otp.com'
     FREE_MESSAGES_LIMIT = int(os.environ.get('FREE_MESSAGES_LIMIT') or 1000)
     MESSAGE_PRICE = float(os.environ.get('MESSAGE_PRICE') or 0.25)
     LOW_BALANCE_THRESHOLD = int(os.environ.get('LOW_BALANCE_THRESHOLD') or 50)

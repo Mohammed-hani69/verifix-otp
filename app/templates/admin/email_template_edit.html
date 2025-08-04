@@ -1,0 +1,222 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="dashboard-card">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <h2 class="text-gradient mb-2">
+                            <i class="bi bi-pencil-square"></i>
+                            تعديل قالب البريد: {{ template.template_name }}
+                        </h2>
+                        <p class="text-muted mb-0">تخصيص وتعديل قالب البريد الإلكتروني</p>
+                    </div>
+                    <div class="col-md-4 text-end">
+                        <a href="{{ url_for('admin.email_templates') }}" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-right"></i> العودة للقوالب
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- نموذج التعديل -->
+        <div class="col-lg-6">
+            <div class="card dashboard-card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-gear"></i>
+                        إعدادات القالب
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        {{ form.hidden_tag() }}
+                        
+                        <div class="mb-3">
+                            {{ form.template_name.label(class="form-label fw-bold") }}
+                            {{ form.template_name(class="form-control" + (" is-invalid" if form.template_name.errors else "")) }}
+                            {% for error in form.template_name.errors %}
+                                <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="mb-3">
+                            {{ form.subject.label(class="form-label fw-bold") }}
+                            {{ form.subject(class="form-control" + (" is-invalid" if form.subject.errors else "")) }}
+                            {% for error in form.subject.errors %}
+                                <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                            <div class="form-text">
+                                يمكن استخدام المتغيرات: {{company_name}}, {{site_name}}, {{verification_code}}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    {{ form.primary_color.label(class="form-label fw-bold") }}
+                                    <div class="input-group">
+                                        {{ form.primary_color(class="form-control", type="color") }}
+                                        <span class="input-group-text">
+                                            <i class="bi bi-palette"></i>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    {{ form.secondary_color.label(class="form-label fw-bold") }}
+                                    <div class="input-group">
+                                        {{ form.secondary_color(class="form-control", type="color") }}
+                                        <span class="input-group-text">
+                                            <i class="bi bi-palette"></i>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <div class="form-check">
+                                {{ form.is_active(class="form-check-input") }}
+                                {{ form.is_active.label(class="form-check-label") }}
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            {{ form.html_content.label(class="form-label fw-bold") }}
+                            {{ form.html_content(class="form-control" + (" is-invalid" if form.html_content.errors else ""), rows="15", style="font-family: monospace;") }}
+                            {% for error in form.html_content.errors %}
+                                <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                            <div class="form-text">
+                                يدعم HTML و CSS. استخدم المتغيرات مثل {{company_name}} في المحتوى.
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <button type="button" class="btn btn-outline-primary" onclick="previewTemplate()">
+                                <i class="bi bi-eye"></i> معاينة
+                            </button>
+                            {{ form.submit(class="btn btn-success") }}
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- معاينة القالب -->
+        <div class="col-lg-6">
+            <div class="card dashboard-card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-eye"></i>
+                        معاينة القالب
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle"></i>
+                        <strong>معلومات القالب:</strong>
+                        <ul class="mb-0 mt-2">
+                            <li><strong>النوع:</strong> {{ template.template_type }}</li>
+                            <li><strong>تاريخ الإنشاء:</strong> {{ template.created_at.strftime('%Y-%m-%d %H:%M') }}</li>
+                            <li><strong>آخر تحديث:</strong> {{ template.updated_at.strftime('%Y-%m-%d %H:%M') }}</li>
+                        </ul>
+                    </div>
+                    
+                    <div id="template-preview" class="border rounded p-3" style="max-height: 500px; overflow-y: auto; background-color: #f8f9fa;">
+                        <div class="text-center text-muted">
+                            <i class="bi bi-eye-slash" style="font-size: 2rem;"></i>
+                            <p class="mt-2">اضغط على "معاينة" لرؤية القالب</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- المتغيرات المتاحة -->
+            <div class="card dashboard-card mt-4">
+                <div class="card-header">
+                    <h6 class="mb-0">
+                        <i class="bi bi-code"></i>
+                        المتغيرات المتاحة
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-2">
+                                <code>{{company_name}}</code>
+                                <small class="text-muted d-block">اسم الشركة</small>
+                            </div>
+                            <div class="mb-2">
+                                <code>{{site_name}}</code>
+                                <small class="text-muted d-block">اسم الموقع</small>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-2">
+                                <code>{{verification_code}}</code>
+                                <small class="text-muted d-block">كود التحقق</small>
+                            </div>
+                            <div class="mb-2">
+                                <code>{{current_year}}</code>
+                                <small class="text-muted d-block">السنة الحالية</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function previewTemplate() {
+    const htmlContent = document.querySelector('textarea[name="html_content"]').value;
+    const previewDiv = document.getElementById('template-preview');
+    
+    // استبدال المتغيرات بقيم تجريبية
+    let previewContent = htmlContent
+        .replace(/\{\{company_name\}\}/g, 'شركة تجريبية')
+        .replace(/\{\{site_name\}\}/g, 'Verifix-OTP')
+        .replace(/\{\{verification_code\}\}/g, '123456')
+        .replace(/\{\{current_year\}\}/g, new Date().getFullYear());
+    
+    previewDiv.innerHTML = previewContent;
+}
+
+// معاينة تلقائية عند تغيير الألوان
+document.addEventListener('DOMContentLoaded', function() {
+    const colorInputs = document.querySelectorAll('input[type="color"]');
+    colorInputs.forEach(input => {
+        input.addEventListener('change', function() {
+            previewTemplate();
+        });
+    });
+});
+</script>
+
+<style>
+#template-preview {
+    background-color: white;
+}
+
+#template-preview * {
+    max-width: 100% !important;
+}
+
+code {
+    background-color: #f8f9fa;
+    padding: 2px 6px;
+    border-radius: 4px;
+    border: 1px solid #e9ecef;
+}
+</style>
+{% endblock %}

@@ -1,0 +1,248 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="dashboard-card">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <h2 class="text-gradient mb-2">
+                            <i class="bi bi-receipt"></i>
+                            تفاصيل طلب شحن الرصيد #{{ balance_request.id }}
+                        </h2>
+                        <p class="text-muted mb-0">مراجعة تفاصيل طلب شحن الرصيد والاتخاذ الإجراء المناسب</p>
+                    </div>
+                    <div class="col-md-4 text-end">
+                        <a href="{{ url_for('admin.balance_requests') }}" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-right"></i> العودة للقائمة
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- تفاصيل الطلب -->
+        <div class="col-lg-8">
+            <div class="card dashboard-card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-info-circle"></i>
+                        تفاصيل الطلب
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <table class="table table-borderless">
+                                <tr>
+                                    <td class="fw-bold">رقم الطلب:</td>
+                                    <td>#{{ balance_request.id }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-bold">الشركة:</td>
+                                    <td>
+                                        <div>{{ balance_request.company.company_name }}</div>
+                                        <small class="text-muted">{{ balance_request.company.email }}</small>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-bold">المبلغ المطلوب:</td>
+                                    <td><span class="h5 text-success">{{ "%.2f"|format(balance_request.amount) }} جنيه</span></td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-bold">رقم التحويل:</td>
+                                    <td>
+                                        {% if balance_request.transfer_number %}
+                                            <code>{{ balance_request.transfer_number }}</code>
+                                        {% else %}
+                                            <span class="text-muted">غير محدد</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="col-md-6">
+                            <table class="table table-borderless">
+                                <tr>
+                                    <td class="fw-bold">تاريخ الطلب:</td>
+                                    <td>{{ balance_request.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-bold">الحالة:</td>
+                                    <td>
+                                        {% if balance_request.status == 'pending' %}
+                                            <span class="badge bg-warning fs-6">في الانتظار</span>
+                                        {% elif balance_request.status == 'approved' %}
+                                            <span class="badge bg-success fs-6">مقبول</span>
+                                        {% else %}
+                                            <span class="badge bg-danger fs-6">مرفوض</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-bold">المعالج:</td>
+                                    <td>
+                                        {% if balance_request.approver %}
+                                            <div>{{ balance_request.approver.company_name }}</div>
+                                            <small class="text-muted">{{ balance_request.processed_at.strftime('%Y-%m-%d %H:%M') if balance_request.processed_at }}</small>
+                                        {% else %}
+                                            <span class="text-muted">لم يتم المعالجة</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-bold">الرصيد الحالي:</td>
+                                    <td><span class="text-primary">{{ "%.2f"|format(balance_request.company.balance) }} جنيه</span></td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+
+                    {% if balance_request.admin_notes %}
+                    <hr>
+                    <div class="alert alert-info">
+                        <h6><i class="bi bi-sticky"></i> ملاحظات المدير:</h6>
+                        <p class="mb-0">{{ balance_request.admin_notes }}</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- إيصال التحويل -->
+            {% if balance_request.transfer_receipt %}
+            <div class="card dashboard-card mt-4">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-image"></i>
+                        إيصال التحويل
+                    </h5>
+                </div>
+                <div class="card-body text-center">
+                    <img src="{{ url_for('admin.uploaded_file', filename=balance_request.transfer_receipt) }}" 
+                         class="img-fluid rounded shadow" 
+                         style="max-height: 400px; cursor: pointer;" 
+                         onclick="openImageModal('{{ url_for('admin.uploaded_file', filename=balance_request.transfer_receipt) }}')"
+                         alt="إيصال التحويل">
+                    <div class="mt-2">
+                        <a href="{{ url_for('admin.uploaded_file', filename=balance_request.transfer_receipt) }}" 
+                           target="_blank" class="btn btn-outline-primary btn-sm">
+                            <i class="bi bi-download"></i> تحميل الصورة
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- إجراءات -->
+        <div class="col-lg-4">
+            {% if balance_request.status == 'pending' %}
+            <div class="card dashboard-card">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0">
+                        <i class="bi bi-gear"></i>
+                        إجراءات الطلب
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        {{ form.hidden_tag() }}
+                        
+                        <div class="mb-3">
+                            {{ form.admin_notes.label(class="form-label") }}
+                            {{ form.admin_notes(class="form-control", rows="3", placeholder="أضف ملاحظاتك هنا (اختياري)") }}
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            {{ form.submit_approve(class="btn btn-success btn-lg") }}
+                            {{ form.submit_reject(class="btn btn-danger") }}
+                        </div>
+                    </form>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- معلومات الشركة -->
+            <div class="card dashboard-card mt-3">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-building"></i>
+                        معلومات الشركة
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-sm table-borderless">
+                        <tr>
+                            <td class="fw-bold">الرصيد الحالي:</td>
+                            <td class="text-primary">{{ "%.2f"|format(balance_request.company.balance) }} جنيه</td>
+                        </tr>
+                        <tr>
+                            <td class="fw-bold">إجمالي الرسائل:</td>
+                            <td>{{ balance_request.company.total_messages_sent }}</td>
+                        </tr>
+                        <tr>
+                            <td class="fw-bold">الرسائل المجانية:</td>
+                            <td>{{ balance_request.company.free_messages_used }}</td>
+                        </tr>
+                        <tr>
+                            <td class="fw-bold">حالة الحساب:</td>
+                            <td>
+                                {% if balance_request.company.is_active %}
+                                    <span class="badge bg-success">نشط</span>
+                                {% else %}
+                                    <span class="badge bg-danger">معطل</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="fw-bold">تاريخ التسجيل:</td>
+                            <td>{{ balance_request.company.created_at.strftime('%Y-%m-%d') }}</td>
+                        </tr>
+                    </table>
+                    
+                    <hr>
+                    <div class="text-center">
+                        <a href="{{ url_for('admin.company_detail', id=balance_request.company.id) }}" 
+                           class="btn btn-outline-primary btn-sm">
+                            <i class="bi bi-eye"></i> عرض تفاصيل الشركة
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal عرض الصورة -->
+<div class="modal fade" id="imageModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">إيصال التحويل</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body text-center">
+                <img id="modalImage" src="" class="img-fluid" alt="إيصال التحويل">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إغلاق</button>
+                <a id="downloadLink" href="" target="_blank" class="btn btn-primary">
+                    <i class="bi bi-download"></i> تحميل
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function openImageModal(imageUrl) {
+    document.getElementById('modalImage').src = imageUrl;
+    document.getElementById('downloadLink').href = imageUrl;
+    new bootstrap.Modal(document.getElementById('imageModal')).show();
+}
+</script>
+{% endblock %}

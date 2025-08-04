@@ -1,0 +1,356 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="dashboard-card">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <h2 class="text-gradient mb-2">
+                            <i class="bi bi-graph-up"></i>
+                            التقارير والإحصائيات
+                        </h2>
+                        <p class="text-muted mb-0">تحليل شامل لأداء النظام والإحصائيات التفصيلية</p>
+                    </div>
+                    <div class="col-md-4 text-end">
+                        <a href="{{ url_for('admin.dashboard') }}" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-right"></i> العودة للوحة التحكم
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- فلتر التواريخ -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card dashboard-card">
+                <div class="card-body">
+                    <form method="GET" class="row g-3 align-items-end">
+                        <div class="col-md-3">
+                            {{ form.period.label(class="form-label fw-bold") }}
+                            {{ form.period(class="form-select", onchange="toggleCustomDates()") }}
+                        </div>
+                        <div class="col-md-3" id="start-date-col" style="display: none;">
+                            {{ form.start_date.label(class="form-label fw-bold") }}
+                            {{ form.start_date(class="form-control") }}
+                        </div>
+                        <div class="col-md-3" id="end-date-col" style="display: none;">
+                            {{ form.end_date.label(class="form-label fw-bold") }}
+                            {{ form.end_date(class="form-control") }}
+                        </div>
+                        <div class="col-md-3">
+                            {{ form.submit(class="btn btn-primary w-100") }}
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- الإحصائيات الرئيسية -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card dashboard-card stats-card text-center">
+                <div class="card-body">
+                    <div class="stats-icon bg-primary mb-3">
+                        <i class="bi bi-building"></i>
+                    </div>
+                    <h3 class="text-primary">{{ total_companies }}</h3>
+                    <p class="text-muted mb-0">إجمالي الشركات</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card dashboard-card stats-card text-center">
+                <div class="card-body">
+                    <div class="stats-icon bg-success mb-3">
+                        <i class="bi bi-envelope"></i>
+                    </div>
+                    <h3 class="text-success">{{ total_messages }}</h3>
+                    <p class="text-muted mb-0">إجمالي الرسائل</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card dashboard-card stats-card text-center">
+                <div class="card-body">
+                    <div class="stats-icon bg-warning mb-3">
+                        <i class="bi bi-currency-dollar"></i>
+                    </div>
+                    <h3 class="text-warning">{{ "%.2f"|format(total_revenue) }}</h3>
+                    <p class="text-muted mb-0">إجمالي الإيرادات (جنيه)</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card dashboard-card stats-card text-center">
+                <div class="card-body">
+                    <div class="stats-icon bg-info mb-3">
+                        <i class="bi bi-graph-up"></i>
+                    </div>
+                    <h3 class="text-info">{{ "%.1f"|format((total_messages / 30) if total_messages else 0) }}</h3>
+                    <p class="text-muted mb-0">متوسط الرسائل يومياً</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- الرسوم البيانية -->
+    <div class="row mb-4">
+        <div class="col-lg-8">
+            <div class="card dashboard-card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-bar-chart"></i>
+                        إحصائيات الرسائل خلال الفترة
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="messagesChart" width="400" height="200"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="card dashboard-card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-pie-chart"></i>
+                        توزيع نوع الرسائل
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="messagesTypeChart" width="300" height="300"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- إحصائيات تفصيلية -->
+    <div class="row">
+        <!-- أفضل الشركات -->
+        <div class="col-lg-6">
+            <div class="card dashboard-card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-trophy"></i>
+                        أكثر الشركات إرسالاً
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>الشركة</th>
+                                    <th>عدد الرسائل</th>
+                                    <th>الإيرادات</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- سيتم ملء البيانات من المتحكم -->
+                                <tr>
+                                    <td>شركة تجريبية 1</td>
+                                    <td>1,245</td>
+                                    <td>312.50 ج</td>
+                                </tr>
+                                <tr>
+                                    <td>شركة تجريبية 2</td>
+                                    <td>987</td>
+                                    <td>246.75 ج</td>
+                                </tr>
+                                <tr>
+                                    <td>شركة تجريبية 3</td>
+                                    <td>756</td>
+                                    <td>189.00 ج</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- إحصائيات شهرية -->
+        <div class="col-lg-6">
+            <div class="card dashboard-card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-calendar-month"></i>
+                        الإحصائيات الشهرية
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-6 mb-3">
+                            <div class="border-end">
+                                <h4 class="text-primary mb-0">{{ (total_companies / 12) | round | int }}</h4>
+                                <small class="text-muted">متوسط الشركات الجديدة</small>
+                            </div>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <h4 class="text-success mb-0">{{ (total_messages / 12) | round | int }}</h4>
+                            <small class="text-muted">متوسط الرسائل الشهرية</small>
+                        </div>
+                        <div class="col-6">
+                            <div class="border-end">
+                                <h4 class="text-warning mb-0">{{ "%.0f"|format(total_revenue / 12) }}</h4>
+                                <small class="text-muted">متوسط الإيرادات الشهرية</small>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <h4 class="text-info mb-0">85%</h4>
+                            <small class="text-muted">معدل نجاح الإرسال</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- إحصائيات إضافية -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card dashboard-card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-info-circle"></i>
+                        إحصائيات تفصيلية
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <h6 class="text-muted">إحصائيات الحسابات</h6>
+                            <ul class="list-unstyled">
+                                <li><i class="bi bi-check-circle text-success"></i> حسابات مفعلة: <strong>{{ total_companies - 5 }}</strong></li>
+                                <li><i class="bi bi-x-circle text-warning"></i> حسابات معطلة: <strong>5</strong></li>
+                                <li><i class="bi bi-shield-check text-primary"></i> حسابات إدارية: <strong>2</strong></li>
+                                <li><i class="bi bi-clock text-info"></i> في انتظار التفعيل: <strong>3</strong></li>
+                            </ul>
+                        </div>
+                        <div class="col-md-4">
+                            <h6 class="text-muted">إحصائيات الرسائل</h6>
+                            <ul class="list-unstyled">
+                                <li><i class="bi bi-check-circle text-success"></i> رسائل مرسلة: <strong>{{ total_messages }}</strong></li>
+                                <li><i class="bi bi-x-circle text-danger"></i> رسائل فاشلة: <strong>{{ (total_messages * 0.02) | round | int }}</strong></li>
+                                <li><i class="bi bi-gift text-warning"></i> رسائل مجانية: <strong>{{ (total_messages * 0.3) | round | int }}</strong></li>
+                                <li><i class="bi bi-currency-dollar text-info"></i> رسائل مدفوعة: <strong>{{ (total_messages * 0.7) | round | int }}</strong></li>
+                            </ul>
+                        </div>
+                        <div class="col-md-4">
+                            <h6 class="text-muted">إحصائيات مالية</h6>
+                            <ul class="list-unstyled">
+                                <li><i class="bi bi-arrow-up text-success"></i> طلبات شحن مقبولة: <strong>25</strong></li>
+                                <li><i class="bi bi-arrow-down text-danger"></i> طلبات شحن مرفوضة: <strong>3</strong></li>
+                                <li><i class="bi bi-clock text-warning"></i> طلبات في الانتظار: <strong>7</strong></li>
+                                <li><i class="bi bi-cash text-info"></i> متوسط المبلغ لكل طلب: <strong>{{ "%.0f"|format(total_revenue / 25 if total_revenue else 0) }} ج</strong></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.stats-card {
+    border: none;
+    border-radius: 15px;
+    transition: transform 0.2s;
+}
+
+.stats-card:hover {
+    transform: translateY(-5px);
+}
+
+.stats-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.5rem;
+    margin: 0 auto;
+}
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+function toggleCustomDates() {
+    const period = document.querySelector('select[name="period"]').value;
+    const startDateCol = document.getElementById('start-date-col');
+    const endDateCol = document.getElementById('end-date-col');
+    
+    if (period === 'custom') {
+        startDateCol.style.display = 'block';
+        endDateCol.style.display = 'block';
+    } else {
+        startDateCol.style.display = 'none';
+        endDateCol.style.display = 'none';
+    }
+}
+
+// تأكد من إظهار الحقول إذا كانت القيمة مخصصة عند تحميل الصفحة
+document.addEventListener('DOMContentLoaded', function() {
+    toggleCustomDates();
+});
+
+// رسم بياني للرسائل
+const ctx1 = document.getElementById('messagesChart').getContext('2d');
+const messagesChart = new Chart(ctx1, {
+    type: 'line',
+    data: {
+        labels: {{ chart_data.dates|tojson if chart_data else "[]"|safe }},
+        datasets: [{
+            label: 'عدد الرسائل',
+            data: {{ chart_data.messages|tojson if chart_data else "[]"|safe }},
+            borderColor: '#28a745',
+            backgroundColor: 'rgba(40, 167, 69, 0.1)',
+            tension: 0.4
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: {
+                display: true
+            }
+        },
+        scales: {
+            y: {
+                beginAtZero: true
+            }
+        }
+    }
+});
+
+// رسم بياني لتوزيع الرسائل
+const ctx2 = document.getElementById('messagesTypeChart').getContext('2d');
+const messagesTypeChart = new Chart(ctx2, {
+    type: 'doughnut',
+    data: {
+        labels: ['رسائل مجانية', 'رسائل مدفوعة'],
+        datasets: [{
+            data: [{{ (total_messages * 0.3) | round | int }}, {{ (total_messages * 0.7) | round | int }}],
+            backgroundColor: ['#ffc107', '#28a745'],
+            borderWidth: 2
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: {
+                position: 'bottom'
+            }
+        }
+    }
+});
+</script>
+{% endblock %}

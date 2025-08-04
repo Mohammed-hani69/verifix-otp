@@ -1,0 +1,338 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="dashboard-card">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <h2 class="text-gradient mb-2">
+                            <i class="bi bi-building"></i>
+                            إدارة الشركات
+                        </h2>
+                        <p class="text-muted mb-0">إدارة ومراقبة جميع الشركات المسجلة في النظام</p>
+                    </div>
+                    <div class="col-md-4 text-end">
+                        <a href="{{ url_for('admin.dashboard') }}" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-right"></i> العودة للوحة التحكم
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- البحث والفلاتر -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card dashboard-card">
+                <div class="card-body">
+                    <form method="GET" class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold">البحث</label>
+                            <input type="text" class="form-control" name="search" 
+                                   value="{{ search }}" placeholder="اسم الشركة أو البريد الإلكتروني">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label fw-bold">الحالة</label>
+                            <select class="form-select" name="status">
+                                <option value="all" {% if status_filter == 'all' %}selected{% endif %}>الكل</option>
+                                <option value="active" {% if status_filter == 'active' %}selected{% endif %}>نشطة</option>
+                                <option value="inactive" {% if status_filter == 'inactive' %}selected{% endif %}>معطلة</option>
+                                <option value="verified" {% if status_filter == 'verified' %}selected{% endif %}>مفعلة</option>
+                                <option value="unverified" {% if status_filter == 'unverified' %}selected{% endif %}>غير مفعلة</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3 d-flex align-items-end">
+                            <button type="submit" class="btn btn-primary me-2">
+                                <i class="bi bi-search"></i> بحث
+                            </button>
+                            <a href="{{ url_for('admin.companies') }}" class="btn btn-outline-secondary">
+                                <i class="bi bi-arrow-clockwise"></i> إعادة تعيين
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- قائمة الشركات -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card dashboard-card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="bi bi-list"></i>
+                        قائمة الشركات ({{ companies.total }})
+                    </h5>
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-outline-primary dropdown-toggle" data-bs-toggle="dropdown">
+                            <i class="bi bi-three-dots"></i> إجراءات مجمعة
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="#" onclick="bulkAction('activate')">
+                                <i class="bi bi-check-circle text-success"></i> تفعيل المحدد
+                            </a></li>
+                            <li><a class="dropdown-item" href="#" onclick="bulkAction('deactivate')">
+                                <i class="bi bi-x-circle text-danger"></i> إلغاء تفعيل المحدد
+                            </a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="#" onclick="bulkAction('add_balance')">
+                                <i class="bi bi-currency-dollar text-warning"></i> إضافة رصيد
+                            </a></li>
+                            <li><a class="dropdown-item" href="#" onclick="bulkAction('reset_free_messages')">
+                                <i class="bi bi-arrow-clockwise text-info"></i> إعادة تعيين الرسائل المجانية
+                            </a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="card-body">
+                    {% if companies.items %}
+                        <form id="bulk-form" method="POST" action="{{ url_for('admin.bulk_actions') }}">
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th width="40">
+                                                <input type="checkbox" id="select-all" class="form-check-input">
+                                            </th>
+                                            <th>الشركة</th>
+                                            <th>البريد الإلكتروني</th>
+                                            <th>الحالة</th>
+                                            <th>الرصيد</th>
+                                            <th>الرسائل</th>
+                                            <th>تاريخ التسجيل</th>
+                                            <th width="120">الإجراءات</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for company in companies.items %}
+                                        <tr>
+                                            <td>
+                                                <input type="checkbox" name="selected_companies" value="{{ company.id }}" 
+                                                       class="form-check-input company-checkbox">
+                                            </td>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <div class="avatar me-2">
+                                                        <i class="bi bi-building text-primary"></i>
+                                                    </div>
+                                                    <div>
+                                                        <strong>{{ company.company_name }}</strong>
+                                                        {% if company.is_admin %}
+                                                            <span class="badge bg-danger ms-1">إدارة</span>
+                                                        {% endif %}
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>{{ company.email }}</td>
+                                            <td>
+                                                <div class="d-flex flex-column">
+                                                    {% if company.is_active %}
+                                                        <span class="badge bg-success mb-1">نشط</span>
+                                                    {% else %}
+                                                        <span class="badge bg-danger mb-1">معطل</span>
+                                                    {% endif %}
+                                                    
+                                                    {% if company.is_verified %}
+                                                        <span class="badge bg-info">مفعل</span>
+                                                    {% else %}
+                                                        <span class="badge bg-warning">غير مفعل</span>
+                                                    {% endif %}
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <strong class="text-success">{{ "%.2f"|format(company.balance) }} ج</strong>
+                                            </td>
+                                            <td>
+                                                <div class="small">
+                                                    <div>المرسلة: {{ company.total_messages_sent }}</div>
+                                                    <div>المجانية: {{ company.free_messages_used }}/1000</div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="small">
+                                                    {{ company.created_at.strftime('%Y-%m-%d') }}
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="btn-group btn-group-sm">
+                                                    <a href="{{ url_for('admin.company_edit', id=company.id) }}" 
+                                                       class="btn btn-outline-primary" title="تعديل">
+                                                        <i class="bi bi-pencil"></i>
+                                                    </a>
+                                                    <button type="button" class="btn btn-outline-warning" 
+                                                            onclick="toggleStatus({{ company.id }})" 
+                                                            title="تغيير الحالة">
+                                                        <i class="bi bi-toggle-{{ 'on' if company.is_active else 'off' }}"></i>
+                                                    </button>
+                                                    <button type="button" class="btn btn-outline-success" 
+                                                            onclick="addBalance({{ company.id }}, '{{ company.company_name }}')" 
+                                                            title="إضافة رصيد">
+                                                        <i class="bi bi-currency-dollar"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </form>
+
+                        <!-- التقسيم -->
+                        {% if companies.pages > 1 %}
+                        <nav class="mt-4">
+                            <ul class="pagination justify-content-center">
+                                {% if companies.has_prev %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="{{ url_for('admin.companies', page=companies.prev_num, search=search, status=status_filter) }}">
+                                            السابق
+                                        </a>
+                                    </li>
+                                {% endif %}
+                                
+                                {% for page_num in companies.iter_pages() %}
+                                    {% if page_num %}
+                                        {% if page_num != companies.page %}
+                                            <li class="page-item">
+                                                <a class="page-link" href="{{ url_for('admin.companies', page=page_num, search=search, status=status_filter) }}">
+                                                    {{ page_num }}
+                                                </a>
+                                            </li>
+                                        {% else %}
+                                            <li class="page-item active">
+                                                <span class="page-link">{{ page_num }}</span>
+                                            </li>
+                                        {% endif %}
+                                    {% else %}
+                                        <li class="page-item disabled">
+                                            <span class="page-link">...</span>
+                                        </li>
+                                    {% endif %}
+                                {% endfor %}
+                                
+                                {% if companies.has_next %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="{{ url_for('admin.companies', page=companies.next_num, search=search, status=status_filter) }}">
+                                            التالي
+                                        </a>
+                                    </li>
+                                {% endif %}
+                            </ul>
+                        </nav>
+                        {% endif %}
+                    {% else %}
+                        <div class="text-center py-5">
+                            <i class="bi bi-inbox text-muted" style="font-size: 3rem;"></i>
+                            <h5 class="text-muted mt-3">لا توجد شركات</h5>
+                            <p class="text-muted">لم يتم العثور على شركات تطابق معايير البحث</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal إضافة رصيد -->
+<div class="modal fade" id="addBalanceModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">إضافة رصيد</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="add-balance-form" method="POST">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">الشركة</label>
+                        <input type="text" id="company-name-display" class="form-control" readonly>
+                        <input type="hidden" id="company-id" name="company_id">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">المبلغ (جنيه)</label>
+                        <input type="number" name="amount" class="form-control" min="1" step="0.01" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">السبب</label>
+                        <textarea name="reason" class="form-control" rows="3" required></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                    <button type="submit" class="btn btn-success">إضافة الرصيد</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+// تحديد/إلغاء تحديد الكل
+document.getElementById('select-all').addEventListener('change', function() {
+    const checkboxes = document.querySelectorAll('.company-checkbox');
+    checkboxes.forEach(cb => cb.checked = this.checked);
+});
+
+// تغيير حالة الشركة
+function toggleStatus(companyId) {
+    if (confirm('هل تريد تغيير حالة هذه الشركة؟')) {
+        fetch(`/admin/company/${companyId}/toggle-status`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': document.querySelector('input[name="csrf_token"]').value
+            }
+        }).then(() => {
+            location.reload();
+        });
+    }
+}
+
+// إضافة رصيد
+function addBalance(companyId, companyName) {
+    document.getElementById('company-id').value = companyId;
+    document.getElementById('company-name-display').value = companyName;
+    document.getElementById('add-balance-form').action = `/admin/company/${companyId}/add-balance`;
+    
+    const modal = new bootstrap.Modal(document.getElementById('addBalanceModal'));
+    modal.show();
+}
+
+// العمليات المجمعة
+function bulkAction(action) {
+    const selected = document.querySelectorAll('.company-checkbox:checked');
+    if (selected.length === 0) {
+        alert('يرجى اختيار شركة واحدة على الأقل');
+        return;
+    }
+    
+    let message = `تنفيذ "${action}" على ${selected.length} شركة؟`;
+    if (confirm(message)) {
+        const form = document.getElementById('bulk-form');
+        const actionInput = document.createElement('input');
+        actionInput.type = 'hidden';
+        actionInput.name = 'action';
+        actionInput.value = action;
+        form.appendChild(actionInput);
+        
+        if (action === 'add_balance') {
+            const amount = prompt('أدخل المبلغ المراد إضافته:');
+            if (amount && parseFloat(amount) > 0) {
+                const amountInput = document.createElement('input');
+                amountInput.type = 'hidden';
+                amountInput.name = 'amount';
+                amountInput.value = amount;
+                form.appendChild(amountInput);
+                form.submit();
+            }
+        } else {
+            form.submit();
+        }
+    }
+}
+</script>
+{% endblock %}
