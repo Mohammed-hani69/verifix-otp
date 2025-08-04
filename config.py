@@ -1,11 +1,27 @@
 import os
 from datetime import timedelta
 
+basedir = os.path.abspath(os.path.dirname(__file__))
+
 class Config:
     """إعدادات التطبيق الأساسية"""
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'dev-secret-key-change-in-production'
-    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or 'sqlite:///app.db'
+    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
+        'sqlite:///' + os.path.join(basedir, 'instance', 'app.db')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+    
+    @staticmethod
+    def init_app(app):
+        """تهيئة التطبيق مع التأكد من وجود المجلدات"""
+        # إنشاء مجلد قاعدة البيانات إذا لم يكن موجوداً
+        db_dir = os.path.dirname(os.path.join(basedir, 'instance', 'app.db'))
+        if not os.path.exists(db_dir):
+            os.makedirs(db_dir)
+        
+        # إنشاء مجلد الرفع إذا لم يكن موجوداً
+        upload_dir = os.path.join(basedir, app.config['UPLOAD_FOLDER'])
+        if not os.path.exists(upload_dir):
+            os.makedirs(upload_dir)
     
     # إعدادات البريد الإلكتروني
     MAIL_SERVER = os.environ.get('MAIL_SERVER') or 'smtp.gmail.com'

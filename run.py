@@ -4,6 +4,7 @@
 نظام إرسال الرسائل الإلكترونية للشركات
 """
 
+import os
 from app import create_app, db
 from app.models import Company, EmailService, CompanyService, EmailTemplate, EmailLog
 from flask import current_app
@@ -26,7 +27,17 @@ def make_shell_context():
 def init_db():
     """إنشاء قاعدة البيانات وإدخال البيانات الأساسية"""
     print("🔄 إنشاء قاعدة البيانات...")
-    db.create_all()
+    
+    # التأكد من وجود مجلد instance
+    instance_dir = os.path.join(os.path.dirname(__file__), 'instance')
+    if not os.path.exists(instance_dir):
+        os.makedirs(instance_dir)
+        print("📁 تم إنشاء مجلد instance")
+    
+    # إنشاء قاعدة البيانات
+    with app.app_context():
+        db.create_all()
+        print("📊 تم إنشاء جداول قاعدة البيانات")
     
     # إضافة الخدمات الأساسية
     services = [

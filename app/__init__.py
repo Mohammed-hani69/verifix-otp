@@ -18,9 +18,17 @@ def create_app(config_name=None):
     """إنشاء تطبيق Flask"""
     app = Flask(__name__)
     
+    # إنشاء مجلد instance إذا لم يكن موجوداً
+    instance_path = app.instance_path
+    if not os.path.exists(instance_path):
+        os.makedirs(instance_path)
+    
     # تحديد إعدادات التطبيق
     config_name = config_name or os.environ.get('FLASK_CONFIG') or 'default'
     app.config.from_object(config[config_name])
+    
+    # تهيئة الإعدادات
+    config[config_name].init_app(app)
     
     # تهيئة الإضافات
     db.init_app(app)

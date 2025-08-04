@@ -7,23 +7,27 @@
         <div class="col-12">
             <div class="dashboard-card">
                 <div class="row align-items-center">
-                    <div class="col-md-8">
-                        <h1 class="text-gradient mb-2">
+                    <div class="col-lg-8 col-md-7 col-12">
+                        <h1 class="text-gradient mb-2 fs-4 fs-md-2 fs-lg-1">
                             <i class="bi bi-speedometer2"></i>
                             مرحباً {{ current_user.company_name }}
                         </h1>
-                        <p class="text-muted mb-0">إدارة وتتبع رسائلك الإلكترونية بسهولة</p>
+                        <p class="text-muted mb-0 small">إدارة وتتبع رسائلك الإلكترونية بسهولة</p>
                     </div>
-                    <div class="col-md-4 text-end">
-                        <div class="d-flex justify-content-end gap-2">
-                            <button class="btn btn-outline-primary" data-test-email>
-                                <i class="bi bi-send"></i> رسالة تجريبية
+                    <div class="col-lg-4 col-md-5 col-12 mt-3 mt-md-0">
+                        <div class="d-flex justify-content-end justify-content-md-end justify-content-sm-start flex-wrap gap-2">
+                            <button class="btn btn-outline-primary btn-sm" data-test-email>
+                                <i class="bi bi-send"></i>
+                                <span class="d-none d-sm-inline">رسالة تجريبية</span>
+                                <span class="d-sm-none">تجريبية</span>
                             </button>
-                            <a href="{{ url_for('auth.email_settings') }}" class="btn btn-outline-secondary">
-                                <i class="bi bi-gear"></i> الإعدادات
+                            <a href="{{ url_for('auth.email_settings') }}" class="btn btn-outline-secondary btn-sm">
+                                <i class="bi bi-gear"></i>
+                                <span class="d-none d-sm-inline">الإعدادات</span>
                             </a>
-                            <a href="{{ url_for('dashboard.balance') }}" class="btn btn-outline-secondary">
-                                <i class="bi bi-gear"></i> المحفظه
+                            <a href="{{ url_for('dashboard.balance') }}" class="btn btn-outline-warning btn-sm">
+                                <i class="bi bi-wallet2"></i>
+                                <span class="d-none d-sm-inline">المحفظة</span>
                             </a>
                         </div>
                     </div>
@@ -33,40 +37,40 @@
     </div>
 
     <!-- إحصائيات سريعة -->
-    <div class="row mb-4">
-        <div class="col-md-3">
-            <div class="card stat-card bg-primary text-white">
-                <div class="card-body">
-                    <i class="bi bi-envelope"></i>
-                    <h3 data-stat="total">{{ total_sent }}</h3>
-                    <p class="mb-0">إجمالي الرسائل</p>
+    <div class="row mb-4 g-3">
+        <div class="col-lg-3 col-md-6 col-sm-6 col-12">
+            <div class="card stat-card bg-primary text-white h-100">
+                <div class="card-body text-center">
+                    <i class="bi bi-envelope fs-1 mb-2"></i>
+                    <h3 data-stat="total" class="mb-1">{{ total_sent }}</h3>
+                    <p class="mb-0 small">إجمالي الرسائل</p>
                 </div>
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="card stat-card bg-success text-white">
-                <div class="card-body">
-                    <i class="bi bi-gift"></i>
-                    <h3 data-stat="free">{{ config.FREE_MESSAGES_LIMIT - free_used }}</h3>
-                    <p class="mb-0">رسائل مجانية متبقية</p>
+        <div class="col-lg-3 col-md-6 col-sm-6 col-12">
+            <div class="card stat-card bg-success text-white h-100">
+                <div class="card-body text-center">
+                    <i class="bi bi-gift fs-1 mb-2"></i>
+                    <h3 data-stat="free" class="mb-1">{{ config.FREE_MESSAGES_LIMIT - free_used }}</h3>
+                    <p class="mb-0 small">رسائل مجانية متبقية</p>
                 </div>
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="card stat-card bg-warning text-white">
-                <div class="card-body">
-                    <i class="bi bi-wallet2"></i>
-                    <h3 data-stat="balance" data-balance>{{ "%.2f"|format(balance) }}</h3>
-                    <p class="mb-0">الرصيد (جنيه)</p>
+        <div class="col-lg-3 col-md-6 col-sm-6 col-12">
+            <div class="card stat-card bg-warning text-white h-100">
+                <div class="card-body text-center">
+                    <i class="bi bi-wallet2 fs-1 mb-2"></i>
+                    <h3 data-stat="balance" data-balance class="mb-1">{{ "%.2f"|format(balance) }}</h3>
+                    <p class="mb-0 small">الرصيد (جنيه)</p>
                 </div>
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="card stat-card bg-info text-white">
-                <div class="card-body">
-                    <i class="bi bi-calendar-month"></i>
-                    <h3 data-stat="monthly">{{ monthly_sent }}</h3>
-                    <p class="mb-0">رسائل هذا الشهر</p>
+        <div class="col-lg-3 col-md-6 col-sm-6 col-12">
+            <div class="card stat-card bg-info text-white h-100">
+                <div class="card-body text-center">
+                    <i class="bi bi-calendar-month fs-1 mb-2"></i>
+                    <h3 data-stat="monthly" class="mb-1">{{ monthly_sent }}</h3>
+                    <p class="mb-0 small">رسائل هذا الشهر</p>
                 </div>
             </div>
         </div>
@@ -86,14 +90,15 @@
     </div>
     {% endif %}
 
-    <div class="row">
+    <div class="row g-4">
         <!-- الرسوم البيانية -->
-        <div class="col-lg-8">
+        <div class="col-lg-8 col-12">
             <div class="card dashboard-card">
                 <div class="card-header">
                     <h5 class="mb-0">
                         <i class="bi bi-bar-chart"></i>
-                        الرسائل المرسلة خلال الأسبوع الماضي
+                        <span class="d-none d-sm-inline">الرسائل المرسلة خلال الأسبوع الماضي</span>
+                        <span class="d-sm-none">الرسائل الأسبوعية</span>
                     </h5>
                 </div>
                 <div class="card-body">
@@ -103,7 +108,7 @@
         </div>
 
         <!-- إعدادات سريعة -->
-        <div class="col-lg-4">
+        <div class="col-lg-4 col-12">
             <div class="card dashboard-card">
                 <div class="card-header">
                     <h5 class="mb-0">
@@ -113,21 +118,26 @@
                 </div>
                 <div class="card-body">
                     <div class="d-grid gap-2">
-                        <a href="{{ url_for('dashboard.templates') }}" class="btn btn-outline-primary">
+                        <a href="{{ url_for('dashboard.templates') }}" class="btn btn-outline-primary btn-sm">
                             <i class="bi bi-file-earmark-richtext"></i>
                             إدارة القوالب
                         </a>
-                        <a href="{{ url_for('dashboard.logs') }}" class="btn btn-outline-info">
+                        <a href="{{ url_for('dashboard.logs') }}" class="btn btn-outline-info btn-sm">
                             <i class="bi bi-clock-history"></i>
                             سجل الرسائل
                         </a>
-                        <a href="{{ url_for('dashboard.api_settings') }}" class="btn btn-outline-secondary">
+                        <a href="{{ url_for('dashboard.api_settings') }}" class="btn btn-outline-secondary btn-sm">
                             <i class="bi bi-key"></i>
                             مفتاح API
                         </a>
-                        <a href="{{ url_for('dashboard.statistics') }}" class="btn btn-outline-success">
+                        <a href="{{ url_for('dashboard.statistics') }}" class="btn btn-outline-success btn-sm">
                             <i class="bi bi-graph-up"></i>
-                            الإحصائيات التفصيلية
+                            <span class="d-none d-sm-inline">الإحصائيات التفصيلية</span>
+                            <span class="d-sm-none">الإحصائيات</span>
+                        </a>
+                        <a href="{{ url_for('auth.balance_request') }}" class="btn btn-primary btn-sm">
+                            <i class="bi bi-plus-circle"></i>
+                            طلب شحن رصيد
                         </a>
                     </div>
                 </div>
@@ -142,19 +152,19 @@
                     </h5>
                 </div>
                 <div class="card-body">
-                    <div class="row text-center">
+                    <div class="row text-center g-2">
                         <div class="col-6">
                             <div class="border-end">
-                                <h4 class="text-primary">{{ current_user.services.count() }}</h4>
+                                <h4 class="text-primary mb-1">{{ current_user.services.count() }}</h4>
                                 <small class="text-muted">خدمات نشطة</small>
                             </div>
                         </div>
                         <div class="col-6">
-                            <h4 class="text-success">{{ current_user.email_templates.count() }}</h4>
+                            <h4 class="text-success mb-1">{{ current_user.email_templates.count() }}</h4>
                             <small class="text-muted">قوالب مخصصة</small>
                         </div>
                     </div>
-                    <hr>
+                    <hr class="my-3">
                     <div class="text-center">
                         <small class="text-muted">
                             عضو منذ: {{ current_user.created_at.strftime('%Y-%m-%d') }}
@@ -181,51 +191,61 @@
                 <div class="card-body">
                     {% if recent_logs %}
                     <div class="table-responsive">
-                        <table class="table table-hover">
+                        <table class="table table-hover table-sm">
                             <thead>
                                 <tr>
-                                    <th>المستقبل</th>
+                                    <th class="d-none d-md-table-cell">المستقبل</th>
                                     <th>الموضوع</th>
-                                    <th>نوع الخدمة</th>
+                                    <th class="d-none d-lg-table-cell">نوع الخدمة</th>
                                     <th>الحالة</th>
-                                    <th>التاريخ</th>
-                                    <th>التكلفة</th>
+                                    <th class="d-none d-sm-table-cell">التاريخ</th>
+                                    <th class="d-none d-md-table-cell">التكلفة</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {% for log in recent_logs %}
                                 <tr>
-                                    <td>
+                                    <td class="d-none d-md-table-cell">
                                         <div class="d-flex align-items-center">
                                             <i class="bi bi-envelope me-2 text-primary"></i>
-                                            {{ log.recipient_email }}
+                                            <span class="text-truncate" style="max-width: 150px;" title="{{ log.recipient_email }}">
+                                                {{ log.recipient_email }}
+                                            </span>
                                         </div>
                                     </td>
-                                    <td>{{ log.subject[:50] }}{% if log.subject|length > 50 %}...{% endif %}</td>
                                     <td>
+                                        <span class="text-truncate d-block" style="max-width: 200px;" title="{{ log.subject }}">
+                                            {{ log.subject[:30] }}{% if log.subject|length > 30 %}...{% endif %}
+                                        </span>
+                                        <small class="text-muted d-md-none">{{ log.recipient_email[:20] }}...</small>
+                                    </td>
+                                    <td class="d-none d-lg-table-cell">
                                         <span class="badge bg-info">{{ log.service_rel.service_name }}</span>
                                     </td>
                                     <td>
                                         {% if log.status == 'sent' %}
                                             <span class="badge bg-success">
-                                                <i class="bi bi-check-circle"></i> تم الإرسال
+                                                <i class="bi bi-check-circle"></i> 
+                                                <span class="d-none d-sm-inline">تم الإرسال</span>
                                             </span>
                                         {% elif log.status == 'failed' %}
                                             <span class="badge bg-danger">
-                                                <i class="bi bi-x-circle"></i> فشل
+                                                <i class="bi bi-x-circle"></i> 
+                                                <span class="d-none d-sm-inline">فشل</span>
                                             </span>
                                         {% else %}
                                             <span class="badge bg-warning">
-                                                <i class="bi bi-clock"></i> في الانتظار
+                                                <i class="bi bi-clock"></i> 
+                                                <span class="d-none d-sm-inline">انتظار</span>
                                             </span>
                                         {% endif %}
                                     </td>
-                                    <td>
+                                    <td class="d-none d-sm-table-cell">
                                         <small class="text-muted">
-                                            {{ log.sent_at.strftime('%Y-%m-%d %H:%M') }}
+                                            {{ log.sent_at.strftime('%m-%d %H:%M') }}
                                         </small>
                                     </td>
-                                    <td>
+                                    <td class="d-none d-md-table-cell">
                                         {% if log.was_free %}
                                             <span class="badge bg-success">مجانية</span>
                                         {% else %}
@@ -269,6 +289,32 @@
         apiKeyElement.dataset.apiKey = '{{ current_user.api_key }}';
         apiKeyElement.style.display = 'none';
         document.body.appendChild(apiKeyElement);
+        
+        // تحسين التجاوب للجداول
+        if (window.innerWidth < 768) {
+            const tables = document.querySelectorAll('.table-responsive');
+            tables.forEach(table => {
+                table.style.fontSize = '0.85rem';
+            });
+        }
+        
+        // إخفاء/إظهار أعمدة حسب حجم الشاشة
+        function adjustTableColumns() {
+            const screenWidth = window.innerWidth;
+            const hiddenCols = document.querySelectorAll('.d-none.d-md-table-cell, .d-none.d-lg-table-cell, .d-none.d-sm-table-cell');
+            
+            if (screenWidth < 576) {
+                // للشاشات الصغيرة جداً - إخفاء المزيد من الأعمدة
+                hiddenCols.forEach(col => {
+                    if (col.classList.contains('d-sm-table-cell')) {
+                        col.style.display = 'none';
+                    }
+                });
+            }
+        }
+        
+        adjustTableColumns();
+        window.addEventListener('resize', adjustTableColumns);
     });
     {% endif %}
 </script>
